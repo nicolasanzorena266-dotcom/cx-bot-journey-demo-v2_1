@@ -9,7 +9,7 @@ const flows = {
   ventas: {
     start: "ventas_dni",
     nodes: {
-      ventas_dni: { bot: "¡Hola! Soy Pía, tu asistente virtual 😎\n\nPara ayudarte con una consulta comercial, escribime el DNI o CUIT asociado.", inputKey: "dniCuit", next: "ventas_producto" },
+      ventas_dni: { bot: "¡Hola! Soy el asistente virtual CX 😎\n\nPara ayudarte con una consulta comercial, escribime el DNI o CUIT asociado.", inputKey: "dniCuit", next: "ventas_producto" },
       ventas_producto: { bot: "¿Qué servicio o producto querés consultar?", options: [
         ["Internet / TV", "ventas_fin"], ["Línea móvil", "ventas_fin"], ["Combo / Conexión Total", "ventas_fin"], ["Portabilidad", "ventas_fin"], ["Equipo contra factura", "ventas_fin"], ["Línea adicional", "ventas_fin"], ["Reposición de SIM / recuperar línea", "ventas_fin"], ["Otro producto / servicio", "ventas_fin"]
       ], storeKey: "productoSolicitado" },
@@ -149,7 +149,7 @@ function runNode() {
   if (node.options) renderOptions(node.options, node.storeKey);
   if (node.advisor) {
     setTimeout(() => {
-      addMessage("Hola, soy un asesor. Ya veo el recorrido que hiciste con Pía.", "advisor");
+      addMessage("Hola, soy un asesor. Ya veo el recorrido que hiciste con el bot.", "advisor");
       renderAdvisorCard();
       saveConversation();
     }, 650);

@@ -14,3 +14,11 @@ Simulador CX de recorridos conversacionales para presentar flujos, capturar cont
 ## Nota
 
 Demo conceptual. No usa datos reales ni se conecta a sistemas productivos.
+
+
+## Ajustes v8
+
+- Marca visible: Konecta CX Lab.
+- Sin menciones a Personal en interfaz ni respuestas del bot.
+- Placeholder del login genérico, sin nombre de ejemplo.
+- Chat identificado como Asistente CX / Simulador CX.
