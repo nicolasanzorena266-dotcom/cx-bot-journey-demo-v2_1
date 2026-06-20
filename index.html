@@ -3,24 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CX Bot Journey Demo</title>
+  <title>CX Journey Forensics Demo</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="layout">
     <section class="panel intro">
-      <h1>CX Bot Journey Demo</h1>
+      <p class="eyebrow">Personal CX Lab</p>
+      <h1>CX Journey Forensics Demo</h1>
       <p>
-        Simulador conversacional estilo WhatsApp para medir esfuerzo del cliente en recorridos de bot.
+        Simulador conversacional estilo WhatsApp para atravesar escenarios críticos,
+        medir esfuerzo y detectar genes de fricción durante el recorrido.
       </p>
       <p class="muted">
-        Demo basada en un flujo de atención con identificación, selección de servicio, menú y submenús.
-        No usa datos reales.
+        Demo conceptual basada en recorridos de atención. No usa datos reales, no se conecta
+        a sistemas productivos y sirve para presentar hipótesis de mejora antes de implementarlas.
       </p>
+
+      <div class="module-order" aria-label="Módulos del análisis">
+        <span>Ventas · Onboarding</span>
+        <span>Soporte</span>
+        <span>Retención</span>
+        <span>Personal Pay</span>
+        <span>Prepago · Madrugada</span>
+      </div>
 
       <div class="actions">
         <button id="restartBtn" class="secondary">Reiniciar caso</button>
         <button id="reportBtn">Generar métricas</button>
+        <button id="forensicBtn">Análisis forense</button>
         <button id="advisorSuggestionBtn">Sugerencia asesor</button>
         <button id="csvBtn" class="secondary">Descargar CSV</button>
       </div>
@@ -28,7 +39,7 @@
       <div id="summary" class="summary hidden"></div>
     </section>
 
-    <section class="phone">
+    <section class="phone" aria-label="Simulador de chat">
       <div class="phone-header">
         <div class="avatar">P</div>
         <div>
@@ -50,6 +61,7 @@
 
   <script src="flow.js"></script>
   <script src="context-pass.js"></script>
+  <script src="forensics.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

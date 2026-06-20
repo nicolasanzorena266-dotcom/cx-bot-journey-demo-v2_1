@@ -17,10 +17,17 @@ const textForm = document.getElementById("textForm");
 const textInput = document.getElementById("textInput");
 const summary = document.getElementById("summary");
 
-document.getElementById("restartBtn").addEventListener("click", restart);
-document.getElementById("reportBtn").addEventListener("click", showReport);
-document.getElementById("advisorSuggestionBtn").addEventListener("click", showAdvisorSuggestion);
-document.getElementById("csvBtn").addEventListener("click", downloadCSV);
+const restartBtn = document.getElementById("restartBtn");
+const reportBtn = document.getElementById("reportBtn");
+const forensicBtn = document.getElementById("forensicBtn");
+const advisorSuggestionBtn = document.getElementById("advisorSuggestionBtn");
+const csvBtn = document.getElementById("csvBtn");
+
+restartBtn.addEventListener("click", restart);
+reportBtn.addEventListener("click", showReport);
+forensicBtn.addEventListener("click", showForensicAnalysis);
+advisorSuggestionBtn.addEventListener("click", showAdvisorSuggestion);
+csvBtn.addEventListener("click", downloadCSV);
 
 textForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -47,6 +54,7 @@ textForm.addEventListener("submit", (e) => {
       addBotMessage("Veo que no pudiste avanzar con las opciones. Te paso con un asesor para que pueda ayudarte.");
       addAdvisorMessage("Hola, soy un asesor. Ya tengo el recorrido que hiciste con el bot.");
       clearOptions();
+      lastAdvisorTriggerNodeId = lastRealNodeId;
       currentNodeId = "__advisor__";
     }, 450);
   } else {
@@ -198,6 +206,7 @@ function getMetrics() {
 
   return {
     "ID caso": caseId,
+    "Módulo CX": customerData.service || "No seleccionado",
     "Inicio bot": firstBot ? formatTime(new Date(firstBot.timestamp)) : "",
     "Fin bot": lastBot ? formatTime(new Date(lastBot.timestamp)) : "",
     "Tiempo invertido en bot": duration,
@@ -211,6 +220,8 @@ function getMetrics() {
     "Atendido por asesor": attendedByAdvisor,
     "Resuelto por bot": resolvedByBot,
     "Estado final inferido": finalState,
+    "Nodo final": lastAdvisorTriggerNodeId || lastRealNodeId,
+    "Cadena de nodos": visitedNodeIds.join(" >> "),
     "Cadena de opciones": clientButtonEvents.map(e => e.content).join(" >> "),
     "Cadena de respuestas del bot": botEvents.map(e => cleanLine(e.content)).join(" >> ")
   };
@@ -237,7 +248,7 @@ function inferFinalState(attendedByAdvisor, resolvedByBot, lastClient, lastBot) 
   if (resolvedByBot === "Sí") return "Resuelto por bot";
 
   const lastClientText = lastClient ? normalize(lastClient.content) : "";
-  if (["hola", "hola?", "hola??", "no responde", "asesor", "ayuda"].some(p => lastClientText.includes(p))) {
+  if (["hola", "hola?", "hola??", "no responde", "asesor", "ayuda", "no puedo", "no me sirve"].some(p => lastClientText.includes(p))) {
     return "Posible abandono con fricción";
   }
 
@@ -245,24 +256,106 @@ function inferFinalState(attendedByAdvisor, resolvedByBot, lastClient, lastBot) 
   return "Sin actividad";
 }
 
-function countRepeatedMessages(messages) {
-  const counts = {};
-  let repeats = 0;
-
-  messages.forEach(msg => {
-    counts[msg] = (counts[msg] || 0) + 1;
-    if (counts[msg] === 2) repeats += 1;
-  });
-
-  return repeats;
+function buildForensicsContext() {
+  return {
+    events,
+    metrics: getMetrics(),
+    visitedNodeIds,
+    lastRealNodeId,
+    lastAdvisorTriggerNodeId,
+    currentNodeId,
+    customerData
+  };
 }
 
-function msToHuman(ms) {
-  if (ms < 0 || Number.isNaN(ms)) return "No disponible";
-  const totalSeconds = Math.round(ms / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}m ${seconds}s`;
+function showForensicAnalysis() {
+  const analysis = getForensicAnalysis(buildForensicsContext());
+
+  const geneChips = analysis.genes.length
+    ? analysis.genes.map(gene => `<span class="chip" title="${escapeHtml(gene.description)}">${escapeHtml(gene.label)}</span>`).join("")
+    : `<span class="chip muted-chip">Sin genes detectados</span>`;
+
+  const paradoxes = analysis.paradoxes.map(item => `<li>${escapeHtml(item)}</li>`).join("");
+  const signals = analysis.signals.length
+    ? analysis.signals.map(item => `<li>${escapeHtml(item)}</li>`).join("")
+    : `<li>No aparecen señales adicionales fuera del recorrido declarado.</li>`;
+
+  const blackBox = analysis.blackBox.map((item, index) => `
+    <li>
+      <span class="event-index">${index + 1}</span>
+      <strong>${escapeHtml(item.actor)}</strong>
+      <em>${escapeHtml(item.type)}</em>
+      <p>${escapeHtml(item.content)}</p>
+    </li>
+  `).join("");
+
+  summary.classList.remove("hidden");
+  summary.innerHTML = `
+    <h2>Análisis forense CX</h2>
+
+    <div class="forensic-hero">
+      <div>
+        <span class="label">Módulo</span>
+        <strong>${escapeHtml(analysis.service)}</strong>
+      </div>
+      <div>
+        <span class="label">Riesgo CX</span>
+        <strong>${escapeHtml(analysis.riskLevel)} · ${analysis.frictionScore}/10</strong>
+      </div>
+      <div>
+        <span class="label">Gen principal</span>
+        <strong>${escapeHtml(analysis.primaryGeneLabel)}</strong>
+      </div>
+    </div>
+
+    <div class="forensic-grid">
+      <article class="forensic-card">
+        <h3>Genoma de fricción</h3>
+        <div class="chips">${geneChips}</div>
+      </article>
+
+      <article class="forensic-card">
+        <h3>Paradoja detectada</h3>
+        <ul>${paradoxes}</ul>
+      </article>
+
+      <article class="forensic-card">
+        <h3>Momento irreversible</h3>
+        <p>${escapeHtml(analysis.irreversibleMoment)}</p>
+      </article>
+
+      <article class="forensic-card">
+        <h3>Rediseño sugerido</h3>
+        <p>${escapeHtml(analysis.redesignSuggestion)}</p>
+      </article>
+    </div>
+
+    <div class="comparison">
+      <div>
+        <h3>Journey actual</h3>
+        <p>${escapeHtml(analysis.currentJourney)}</p>
+      </div>
+      <div>
+        <h3>Journey ideal</h3>
+        <p>${escapeHtml(analysis.idealJourney)}</p>
+      </div>
+    </div>
+
+    <details class="details-box" open>
+      <summary>Caja negra CX</summary>
+      <ol class="blackbox">${blackBox}</ol>
+    </details>
+
+    <details class="details-box">
+      <summary>Señales adicionales</summary>
+      <ul>${signals}</ul>
+    </details>
+
+    <details class="details-box">
+      <summary>Contexto mínimo para asesor</summary>
+      <p>${escapeHtml(analysis.advisorContext)}</p>
+    </details>
+  `;
 }
 
 function showAdvisorSuggestion() {
@@ -285,13 +378,8 @@ function getAdvisorSuggestion() {
   const nodeId = lastAdvisorTriggerNodeId || lastRealNodeId;
   const nodeSuggestion = ADVISOR_SUGGESTIONS[nodeId];
 
-  // Prioridad 1: sugerencia específica del nodo final.
-  // Esto evita que una regla general, como "respuestas repetidas",
-  // tape el motivo real de contacto.
   if (nodeSuggestion) return fillTemplate(nodeSuggestion);
 
-  // Prioridad 2: reglas generales del recorrido.
-  // Se usan solo cuando no hay un nodo claro con sugerencia cargada.
   const special = getSpecialSuggestion(metrics);
   if (special) return fillTemplate(special);
 
@@ -304,7 +392,7 @@ function getSpecialSuggestion(metrics) {
     .map(e => normalize(e.content));
 
   const hasFreeTextFriction = clientTexts.some(text =>
-    ["hola", "hola?", "hola??", "no responde", "asesor", "ayuda"].some(pattern => text.includes(pattern))
+    ["hola", "hola?", "hola??", "no responde", "asesor", "ayuda", "no puedo", "no me sirve"].some(pattern => text.includes(pattern))
   );
 
   if (hasFreeTextFriction) return SPECIAL_SUGGESTIONS.free_text_friction;
@@ -336,9 +424,8 @@ function fillTemplate(template) {
   const service = customerData.service || "servicio consultado";
   return String(template || "")
     .replaceAll("{{servicio}}", service)
-    .replaceAll("{{dni_cuit}}", customerData.dniCuit || "CUIT/DNI informado");
+    .replaceAll("{{dni_cuit}}", customerData.dniCuit || "DNI/CUIT informado");
 }
-
 
 function showReport() {
   const metrics = getMetrics();
@@ -359,8 +446,22 @@ function showReport() {
 
 function downloadCSV() {
   const metrics = getMetrics();
-  const headers = Object.keys(metrics);
-  const values = headers.map(h => csvEscape(metrics[h]));
+  const analysis = getForensicAnalysis(buildForensicsContext());
+  const forensicFields = {
+    "Riesgo CX": analysis.riskLevel,
+    "Score fricción": analysis.frictionScore,
+    "Gen principal": analysis.primaryGeneLabel,
+    "Genes de fricción": analysis.genes.map(g => g.label).join(" | "),
+    "Paradojas detectadas": analysis.paradoxes.join(" | "),
+    "Momento irreversible": analysis.irreversibleMoment,
+    "Rediseño sugerido": analysis.redesignSuggestion,
+    "Journey ideal": analysis.idealJourney,
+    "Contexto mínimo asesor": analysis.advisorContext
+  };
+
+  const data = { ...metrics, ...forensicFields };
+  const headers = Object.keys(data);
+  const values = headers.map(h => csvEscape(data[h]));
 
   const csv = "\uFEFF" + headers.map(csvEscape).join(";") + "\n" + values.join(";");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -368,7 +469,7 @@ function downloadCSV() {
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${caseId}_metricas.csv`;
+  a.download = `${caseId}_metricas_forenses.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -386,6 +487,26 @@ function normalize(text) {
 
 function cleanLine(text) {
   return String(text || "").replace(/\n+/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function countRepeatedMessages(messages) {
+  const counts = {};
+  let repeats = 0;
+
+  messages.forEach(msg => {
+    counts[msg] = (counts[msg] || 0) + 1;
+    if (counts[msg] === 2) repeats += 1;
+  });
+
+  return repeats;
+}
+
+function msToHuman(ms) {
+  if (ms < 0 || Number.isNaN(ms)) return "No disponible";
+  const totalSeconds = Math.round(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}m ${seconds}s`;
 }
 
 function escapeHtml(text) {

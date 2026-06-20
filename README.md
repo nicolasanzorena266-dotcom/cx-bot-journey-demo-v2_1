@@ -1,74 +1,91 @@
-# CX Bot Journey Demo
+# CX Journey Forensics Demo
 
-Demo interactiva para simular un bot conversacional estilo WhatsApp y medir el esfuerzo del cliente durante el recorrido.
+Demo interactiva para simular recorridos conversacionales estilo WhatsApp y detectar fricciones CX en escenarios críticos de Personal.
 
-La demo no se conecta a sistemas reales, no usa datos de clientes y no replica marcas reales. Sirve para mostrar cómo medir un journey conversacional antes de implementar cambios en un bot productivo.
+La demo no se conecta a sistemas reales, no usa datos de clientes y no replica un flujo productivo. Sirve para presentar hipótesis de mejora, comparar recorridos y mostrar cómo se rompe la experiencia desde una mirada forense.
+
+## Módulos incluidos
+
+El flujo está ordenado así:
+
+1. Ventas - Onboarding del masivo
+2. Soporte
+3. Retención
+4. Personal Pay
+5. Prepago y madrugada
 
 ## Qué permite mostrar
 
-Además de las métricas del recorrido, la demo incluye un botón **Sugerencia asesor**.
+Además de simular el recorrido del cliente, la demo permite generar:
 
-Ese botón muestra solo una recomendación operativa de continuidad para el representante, basada en:
+- Métricas del recorrido.
+- Sugerencia operativa para asesor.
+- Análisis forense CX.
+- Exportación CSV con métricas + genes de fricción.
 
-- el nodo final del recorrido;
-- la última opción seleccionada;
-- si hubo texto libre del cliente;
-- si el recorrido fue extenso;
-- si hubo señales de fricción.
+## Qué agrega la capa forense
 
-No usa IA entrenada. Las sugerencias están cargadas por nodo en `context-pass.js`.
+El botón **Análisis forense** interpreta el recorrido y muestra:
 
-Prioridad de sugerencias:
-1. Primero se usa la sugerencia específica del nodo final.
-2. Si no hay nodo claro, se usa una regla general del recorrido.
+- Módulo CX.
+- Riesgo CX.
+- Score de fricción.
+- Gen principal de fricción.
+- Genoma de fricción completo.
+- Paradoja detectada.
+- Momento irreversible.
+- Rediseño sugerido.
+- Journey actual vs journey ideal.
+- Caja negra CX con los eventos principales.
+- Contexto mínimo para asesor.
 
-## Qué permite medir
+## Conceptos usados
 
-- ID del caso.
-- Inicio del bot.
-- Fin del bot.
-- Tiempo invertido en bot.
-- Cantidad de botones seleccionados por el cliente.
-- Cantidad de mensajes escritos por el cliente.
-- Cantidad de caracteres escritos por el cliente.
-- Cantidad de respuestas del bot.
-- Cantidad de respuestas repetidas del bot.
-- Último mensaje del bot.
-- Último mensaje del cliente.
-- Si fue atendido por asesor.
-- Si fue resuelto por bot.
-- Estado final inferido.
-- Cadena de opciones seleccionadas.
-- Cadena de respuestas del bot.
+### Genoma de fricción
 
-## Cómo usar
+Clasifica la falla de experiencia más allá del motivo declarado.
 
-Abrir `index.html` en el navegador.
+Ejemplos:
 
-También se puede publicar en GitHub Pages:
+- Promesa rota.
+- Incertidumbre postventa.
+- Contexto perdido.
+- Baja como síntoma.
+- Ansiedad financiera.
+- Vulnerabilidad horaria.
+- Paradoja de canal.
+- Autonomía bloqueada.
 
-1. Crear un repositorio.
-2. Subir estos archivos.
-3. Ir a `Settings > Pages`.
-4. En `Branch`, elegir `main` y carpeta `/root`.
-5. Guardar.
-6. Abrir el link público que genera GitHub Pages.
+### Paradoja detectada
+
+Expone contradicciones del sistema.
+
+Ejemplo:
+
+> Necesitás internet para resolver que no tenés internet.
+
+### Momento irreversible
+
+Identifica el punto donde el contacto deja de ser solo operativo y empieza a romper confianza, control o paciencia.
 
 ## Estructura
 
 ```txt
-cx-bot-journey-demo/
+cx-bot-journey-forensics/
 ├── index.html
 ├── style.css
 ├── flow.js
 ├── context-pass.js
+├── forensics.js
 ├── script.js
 └── README.md
 ```
 
-## Cómo editar el flujo
+## Archivos principales
 
-El árbol conversacional está en `flow.js`.
+### `flow.js`
+
+Contiene el árbol conversacional del demo.
 
 Cada nodo puede tener:
 
@@ -85,13 +102,13 @@ También puede pedir texto:
 
 ```js
 {
-  bot: "Escribime tu DNI o CUIT",
+  bot: "Escribime un DNI o CUIT ficticio",
   input: true,
   next: "service_menu"
 }
 ```
 
-También puede derivar a asesor:
+Derivar a asesor:
 
 ```js
 {
@@ -100,15 +117,52 @@ También puede derivar a asesor:
 }
 ```
 
-También puede cerrar como resuelto:
+Cerrar como resuelto:
 
 ```js
 {
-  bot: "Gracias por comunicarte. Me alegra haberte ayudado.",
+  bot: "Gracias por comunicarte.",
   resolved: true
 }
 ```
 
+### `context-pass.js`
+
+Contiene las sugerencias operativas para el asesor según el nodo final del recorrido.
+
+### `forensics.js`
+
+Contiene la lógica nueva:
+
+- genes de fricción;
+- reglas por nodo;
+- paradojas;
+- momentos irreversibles;
+- rediseños sugeridos;
+- score de fricción;
+- journey ideal.
+
+### `script.js`
+
+Registra eventos, calcula métricas, renderiza el chat, muestra reportes, genera análisis forense y exporta CSV.
+
+## Cómo usar localmente
+
+Abrir `index.html` en el navegador.
+
+## Cómo subir a GitHub Pages
+
+Si ya tenés el repo del demo anterior, no hace falta crear uno nuevo.
+
+1. Descargá estos archivos.
+2. Descomprimí el ZIP.
+3. Reemplazá en tu repo los archivos existentes.
+4. Agregá el archivo nuevo `forensics.js`.
+5. Subí los cambios a GitHub.
+6. Esperá a que GitHub Pages actualice el sitio.
+
+Si GitHub Pages ya estaba activo, el link debería seguir siendo el mismo.
+
 ## Nota
 
-Esta es una demo para conversación y métricas, no un bot productivo.
+Esto sigue siendo una demo conceptual. La gracia no es replicar todo el árbol real de Personal, sino tener una herramienta para mostrar cómo un recorrido puede medirse, interpretarse y convertirse en rediseño operativo.

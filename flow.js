@@ -1,428 +1,261 @@
 const FLOW = {
   start: {
-    bot: "¡Hola! Soy Pía, tu línea directa con Personal 😎\n\nSi necesitás consultar o gestionar tus servicios, es acá.\n\nPara empezar, escribime el CUIT o DNI por el que necesitás ayuda, sin puntos ni guiones. ✍️",
+    bot: "¡Hola! Soy Pía, tu línea directa con Personal 😎\n\nEste demo simula recorridos críticos para detectar fricción CX.\n\nPara empezar, escribime un DNI o CUIT ficticio, sin puntos ni guiones. ✍️",
     input: true,
     next: "service_menu"
   },
 
   service_menu: {
-    bot: "Bien. 😊\n\n¿Por qué servicio me estás consultando?",
+    bot: "Bien. 😊\n\nElegí el módulo que querés recorrer:",
     options: [
-      { label: "TV / Internet", next: "tv_internet_menu" },
-      { label: "Línea móvil", next: "mobile_menu" },
-      { label: "Telefonía fija", next: "fixed_menu" }
+      { label: "Ventas - Onboarding del masivo", next: "onboarding_menu" },
+      { label: "Soporte", next: "support_menu" },
+      { label: "Retención", next: "retention_menu" },
+      { label: "Personal Pay", next: "personal_pay_menu" },
+      { label: "Prepago y madrugada", next: "prepaid_night_menu" }
     ]
   },
 
-  tv_internet_menu: {
-    bot: "¡Buenísimo! Contame, ¿cuál es tu consulta sobre tu servicio de TV o Internet?",
+  // 1. Ventas - Onboarding masivo
+  onboarding_menu: {
+    bot: "Módulo Ventas - Onboarding del masivo.\n\nAcá miramos la brecha entre comprar y empezar a ser cliente. ¿Qué caso querés simular?",
     options: [
-      { label: "Facturación", next: "billing_menu" },
-      { label: "Pagos", next: "payments_menu" },
-      { label: "Trámites", next: "procedures_menu" },
-      { label: "Soporte técnico", next: "tech_support_menu" },
-      { label: "Ventas", next: "sales_advisor" },
-      { label: "Baja", next: "cancellation_advisor" }
+      { label: "Compré y no sé si quedó activo", next: "onboarding_activation_unclear" },
+      { label: "Me prometieron algo distinto", next: "onboarding_promise_gap" },
+      { label: "No sé cuál es el próximo paso", next: "onboarding_next_step_unclear" }
     ]
   },
 
-  billing_menu: {
-    bot: "Dale, charlemos sobre tu factura. 🧾\n\n¿Vemos alguno de estos temas?",
+  onboarding_activation_unclear: {
+    bot: "Veo una solicitud comercial iniciada.\n\nLa activación puede demorar y te vamos a avisar cuando esté disponible. Mientras tanto, podés consultar el estado desde Mi Personal.",
     options: [
-      { label: "Descargar factura", next: "download_invoice_menu" },
-      { label: "Entender factura", next: "understand_invoice_menu" },
-      { label: "Facturas anteriores", next: "old_invoices" },
-      { label: "Tengo un problema", next: "billing_problem_menu" },
-      { label: "Volver al menú principal", next: "tv_internet_menu" }
+      { label: "Pero ya me dijeron que estaba activo", next: "onboarding_promise_gap" },
+      { label: "No puedo ver el estado", next: "onboarding_no_tracking" },
+      { label: "Quiero hablar con asesor", next: "onboarding_advisor" }
     ]
   },
 
-  download_invoice_menu: {
-    bot: "La pedís y listo. Acá te comparto tu última factura en PDF.\n\n¿Querés revisar algo más sobre facturación?",
-    options: [
-      { label: "Entender factura", next: "understand_invoice_menu" },
-      { label: "Facturas anteriores", next: "old_invoices" },
-      { label: "No, gracias", next: "resolved_end" }
-    ]
-  },
-
-  understand_invoice_menu: {
-    bot: "Lo más importante de tu factura está arriba a la derecha.\n\nAhí vas a encontrar: total a pagar, vencimiento, referencia de pago y forma de pago.\n\n¿Sobre qué querés que te explique más?",
-    options: [
-      { label: "Total a pagar", next: "invoice_total" },
-      { label: "Vencimiento", next: "invoice_due_date" },
-      { label: "Medios de pago", next: "payments_menu" },
-      { label: "Volver a facturación", next: "billing_menu" }
-    ]
-  },
-
-  invoice_total: {
-    bot: "El total a pagar incluye el abono del período y posibles cargos pendientes o ajustes.\n\n¿Te quedó claro?",
-    options: [
-      { label: "Sí, gracias", next: "resolved_end" },
-      { label: "No entiendo mi deuda", next: "billing_debt_problem" }
-    ]
-  },
-
-  invoice_due_date: {
-    bot: "La fecha de vencimiento indica hasta cuándo podés pagar sin recargos.\n\nSi ya venció, podés consultar medios de pago disponibles.",
-    options: [
-      { label: "Ir a pagos", next: "payments_menu" },
-      { label: "No, gracias", next: "resolved_end" }
-    ]
-  },
-
-  old_invoices: {
-    bot: "Para descargar tus facturas anteriores, entrá acá: https://personal.com.ar/facturas\n\n¿Te ayudo con otra consulta?",
-    options: [
-      { label: "Sí", next: "billing_menu" },
-      { label: "No, gracias", next: "resolved_end" }
-    ]
-  },
-
-  billing_problem_menu: {
-    bot: "Entiendo. Decime cuál es el problema con tu factura:",
-    options: [
-      { label: "Me cobraron de más", next: "overcharged" },
-      { label: "No entiendo mi deuda", next: "billing_debt_problem" },
-      { label: "No recibí factura", next: "missing_invoice" },
-      { label: "Necesito asesor", next: "billing_advisor" }
-    ]
-  },
-
-  overcharged: {
-    bot: "Para revisar un posible cobro de más necesito que un asesor vea el detalle de la cuenta.\n\nTe paso con alguien del equipo.",
+  onboarding_promise_gap: {
+    bot: "Entiendo. Para revisar la condición comercial y el estado de activación, necesito pasarte con un asesor.",
     advisor: true
   },
 
-  billing_debt_problem: {
-    bot: "Veo que esta consulta requiere revisar el detalle de tu deuda y pagos aplicados.\n\nTe paso con un asesor para que lo vea con vos.",
+  onboarding_next_step_unclear: {
+    bot: "Después de la compra, tenés que esperar la confirmación de activación.\n\nSi corresponde instalación o validación adicional, te vamos a contactar.",
+    options: [
+      { label: "¿Cuándo?", next: "onboarding_no_tracking" },
+      { label: "No me sirve esa respuesta", next: "onboarding_advisor" },
+      { label: "Gracias", next: "resolved_end" }
+    ]
+  },
+
+  onboarding_no_tracking: {
+    bot: "Todavía no tengo un estado más detallado para mostrarte desde este canal.\n\nTe paso con un asesor para que revise la solicitud.",
     advisor: true
   },
 
-  missing_invoice: {
-    bot: "Podés descargar tu factura desde Mi Personal.\n\nTambién puedo ayudarte a activar factura digital.",
-    options: [
-      { label: "Activar factura digital", next: "digital_invoice" },
-      { label: "Quiero asesor", next: "billing_advisor" },
-      { label: "No, gracias", next: "resolved_end" }
-    ]
-  },
-
-  billing_advisor: {
-    bot: "Perfecto. Te paso con un asesor para continuar la gestión.",
+  onboarding_advisor: {
+    bot: "Te paso con un asesor para revisar la venta, la promesa comercial y el estado de activación.",
     advisor: true
   },
 
-  payments_menu: {
-    bot: "Perfecto, sigamos por ahí. 😊\n\nTengo mucho para contarte sobre tus pagos.\n\nPara seguir, indicame cómo te ayudo eligiendo una de las opciones del menú.",
+  // 2. Soporte
+  support_menu: {
+    bot: "Módulo Soporte.\n\nAcá miramos diagnóstico, handoff y repetición de pruebas. ¿Qué caso querés recorrer?",
     options: [
-      { label: "Quiero pagar", next: "want_to_pay" },
-      { label: "Sobre mis pagos", next: "about_payments" },
-      { label: "Pago no impactado", next: "payment_not_applied" },
-      { label: "Débito automático", next: "automatic_debit" },
-      { label: "Factura digital", next: "digital_invoice" },
-      { label: "Otros temas", next: "payments_advisor" }
+      { label: "Sin servicio", next: "support_no_service" },
+      { label: "Internet lento", next: "support_slow_service" },
+      { label: "Ya pasé por el bot", next: "support_already_tried" }
     ]
   },
 
-  want_to_pay: {
-    bot: "Genial. Podés abonar con tarjeta o desde un link de pago.\n\n¿Qué preferís?",
-    options: [
-      { label: "Tarjeta", next: "pay_card" },
-      { label: "Link de pago", next: "pay_link" },
-      { label: "Pago en efectivo", next: "cash_payment" }
-    ]
-  },
-
-  pay_card: {
-    bot: "Te comparto el acceso para pagar con tarjeta desde Mi Personal.\n\n¿Necesitás algo más?",
-    options: [
-      { label: "No, gracias", next: "resolved_end" },
-      { label: "Sí, volver a pagos", next: "payments_menu" }
-    ]
-  },
-
-  pay_link: {
-    bot: "Te comparto un link de pago seguro para abonar tu factura.\n\nCuando pagues, puede demorar hasta 48 horas en impactar.",
-    options: [
-      { label: "No, gracias", next: "resolved_end" },
-      { label: "Ya pagué y no impactó", next: "payment_not_applied" }
-    ]
-  },
-
-  cash_payment: {
-    bot: "Podés pagar en puntos habilitados con el código de pago de tu factura.\n\n¿Querés consultar algo más?",
-    options: [
-      { label: "No, gracias", next: "resolved_end" },
-      { label: "Volver a pagos", next: "payments_menu" }
-    ]
-  },
-
-  about_payments: {
-    bot: "Acá podés consultar pagos realizados, pagos pendientes y vencimientos.\n\n¿Qué necesitás revisar?",
-    options: [
-      { label: "Pagos recientes", next: "recent_payments" },
-      { label: "Pago pendiente", next: "pending_payment" },
-      { label: "Otra consulta", next: "payments_advisor" }
-    ]
-  },
-
-  recent_payments: {
-    bot: "El último pago registrado se encuentra aplicado en tu cuenta.\n\n¿Necesitás algo más?",
-    options: [
-      { label: "No, gracias", next: "resolved_end" },
-      { label: "Otra consulta", next: "payments_menu" }
-    ]
-  },
-
-  pending_payment: {
-    bot: "Tenés un pago pendiente asociado a tu factura actual.\n\nPodés pagarlo ahora desde el link de pago.",
-    options: [
-      { label: "Ir a link de pago", next: "pay_link" },
-      { label: "Hablar con asesor", next: "payments_advisor" }
-    ]
-  },
-
-  payment_not_applied: {
-    bot: "Si pagaste hace menos de 48 horas, puede estar procesándose.\n\nSi ya pasaron más de 48 horas, puedo pedirte el comprobante.",
-    options: [
-      { label: "Ya pasaron 48 horas", next: "upload_receipt" },
-      { label: "Espero", next: "resolved_end" },
-      { label: "Quiero asesor", next: "payments_advisor" }
-    ]
-  },
-
-  upload_receipt: {
-    bot: "Para revisar el pago necesito que un asesor valide el comprobante.\n\nTe paso con el equipo.",
-    advisor: true
-  },
-
-  automatic_debit: {
-    bot: "Con débito automático podés adherir, modificar o dar de baja la tarjeta asociada.",
-    options: [
-      { label: "Activar débito", next: "debit_activate" },
-      { label: "Cambiar tarjeta", next: "debit_change_card" },
-      { label: "Dar de baja débito", next: "debit_cancel" }
-    ]
-  },
-
-  debit_activate: {
-    bot: "Te comparto el acceso para adherirte a débito automático desde Mi Personal.\n\n¿Te ayudo con algo más?",
-    options: [
-      { label: "No, gracias", next: "resolved_end" },
-      { label: "Volver a pagos", next: "payments_menu" }
-    ]
-  },
-
-  debit_change_card: {
-    bot: "Para cambiar la tarjeta, ingresá a Mi Personal > Pagos > Débito automático.\n\n¿Querés hacer otra consulta?",
-    options: [
-      { label: "No, gracias", next: "resolved_end" },
-      { label: "Volver a pagos", next: "payments_menu" }
-    ]
-  },
-
-  debit_cancel: {
-    bot: "Para dar de baja el débito automático necesito confirmar algunos datos.\n\nTe paso con un asesor.",
-    advisor: true
-  },
-
-  digital_invoice: {
-    bot: "Podés adherirte a factura digital desde Mi Personal.\n\nUna vez activada, te llega por mail todos los meses.",
-    options: [
-      { label: "No, gracias", next: "resolved_end" },
-      { label: "Volver a pagos", next: "payments_menu" }
-    ]
-  },
-
-  payments_advisor: {
-    bot: "Perfecto. Te paso con un asesor de pagos.",
-    advisor: true
-  },
-
-  procedures_menu: {
-    bot: "¡Bien! Indicame cuál es el trámite que necesitás realizar y te cuento cómo seguir.",
-    options: [
-      { label: "Mudanza", next: "moving" },
-      { label: "Cambio de titular", next: "ownership_change" },
-      { label: "Alta de poder", next: "power_of_attorney" },
-      { label: "Oficinas comerciales", next: "commercial_offices" },
-      { label: "Volver al menú principal", next: "tv_internet_menu" }
-    ]
-  },
-
-  moving: {
-    bot: "Si ya te mudaste o estás por hacerlo, podés gestionar el cambio de domicilio y seguir disfrutando tu conexión en tu nuevo hogar.",
-    options: [
-      { label: "Quiero gestionarlo", next: "moving_advisor" },
-      { label: "No, gracias", next: "resolved_end" }
-    ]
-  },
-
-  moving_advisor: {
-    bot: "Para avanzar con la mudanza necesito que un asesor confirme la cobertura en el nuevo domicilio.",
-    advisor: true
-  },
-
-  ownership_change: {
-    bot: "Para cambiar la titularidad del servicio necesitás documentación del titular y de la persona que toma la cuenta.\n\n¿Querés continuar?",
-    options: [
-      { label: "Sí, continuar", next: "ownership_advisor" },
-      { label: "No, gracias", next: "resolved_end" }
-    ]
-  },
-
-  ownership_advisor: {
-    bot: "Te paso con un asesor para completar el cambio de titularidad.",
-    advisor: true
-  },
-
-  power_of_attorney: {
-    bot: "Bien. Voy a pasarte con alguien del equipo de atención para que te ayuden con eso. ¿Podés conversar ahora?",
-    options: [
-      { label: "Sí", next: "procedures_advisor" },
-      { label: "No", next: "tv_internet_menu" }
-    ]
-  },
-
-  commercial_offices: {
-    bot: "Podés encontrar oficinas comerciales cercanas desde el buscador oficial.\n\n¿Te ayudo con otra consulta?",
-    options: [
-      { label: "Sí", next: "procedures_menu" },
-      { label: "No, gracias", next: "resolved_end" }
-    ]
-  },
-
-  procedures_advisor: {
-    bot: "Te paso con un asesor para continuar el trámite.",
-    advisor: true
-  },
-
-  tech_support_menu: {
-    bot: "Vamos a revisar tu servicio.\n\n¿Qué inconveniente tenés?",
-    options: [
-      { label: "Sin internet", next: "no_internet" },
-      { label: "Internet lento", next: "slow_internet" },
-      { label: "Problema con TV", next: "tv_problem" }
-    ]
-  },
-
-  no_internet: {
-    bot: "Reiniciá el módem y esperá 2 minutos.\n\n¿Volvió el servicio?",
+  support_no_service: {
+    bot: "Vamos a revisar tu servicio.\n\nPrimero reiniciá el módem y esperá 2 minutos. ¿Volvió la conexión?",
     options: [
       { label: "Sí", next: "resolved_end" },
-      { label: "No", next: "tech_advisor" }
+      { label: "No", next: "support_repeated_test" },
+      { label: "Ya lo hice antes", next: "support_already_tried" }
     ]
   },
 
-  slow_internet: {
+  support_slow_service: {
     bot: "Probá acercarte al módem o conectarte por cable para descartar señal WiFi.\n\n¿Mejoró?",
     options: [
       { label: "Sí", next: "resolved_end" },
-      { label: "No", next: "tech_advisor" }
+      { label: "No", next: "support_repeated_test" },
+      { label: "Necesito asesor", next: "support_advisor" }
     ]
   },
 
-  tv_problem: {
-    bot: "Revisá que el decodificador esté encendido y conectado.\n\nSi el problema sigue, te paso con soporte.",
-    options: [
-      { label: "Se solucionó", next: "resolved_end" },
-      { label: "Sigue igual", next: "tech_advisor" }
-    ]
-  },
-
-  tech_advisor: {
-    bot: "Te paso con soporte técnico para revisar tu servicio.",
+  support_repeated_test: {
+    bot: "Si el problema continúa, necesito derivarte a soporte técnico para revisar la línea y el equipo instalado.",
     advisor: true
   },
 
-  mobile_menu: {
-    bot: "📱 Genial. ¿Cuál es tu consulta sobre el servicio de tu línea?",
-    options: [
-      { label: "Mi plan", next: "mobile_plan" },
-      { label: "Packs", next: "mobile_packs" },
-      { label: "Facturación", next: "billing_menu" },
-      { label: "Soporte técnico", next: "tech_support_menu" },
-      { label: "Pagos", next: "payments_menu" },
-      { label: "Roaming", next: "roaming_menu" }
-    ]
-  },
-
-  mobile_plan: {
-    bot: "Con tu plan tenés gigas para navegar y acceso a beneficios desde Mi Personal.\n\n¿Querés consultar algo más?",
-    options: [
-      { label: "No, gracias", next: "resolved_end" },
-      { label: "Comprar packs", next: "mobile_packs" }
-    ]
-  },
-
-  mobile_packs: {
-    bot: "Podés comprar packs de datos, llamadas o roaming desde Mi Personal.",
-    options: [
-      { label: "Pack de datos", next: "resolved_end" },
-      { label: "Pack roaming", next: "roaming_menu" },
-      { label: "Necesito asesor", next: "sales_advisor" }
-    ]
-  },
-
-  roaming_menu: {
-    bot: "Menú Roaming.\n\n¿Qué necesitás saber?",
-    options: [
-      { label: "Cobertura", next: "roaming_coverage" },
-      { label: "Precios", next: "roaming_prices" },
-      { label: "Configurar roaming", next: "roaming_config" },
-      { label: "Solicitar eSIM", next: "esim_advisor" }
-    ]
-  },
-
-  roaming_coverage: {
-    bot: "Te comparto el mapa de cobertura internacional para revisar los destinos disponibles.",
-    options: [
-      { label: "No, gracias", next: "resolved_end" },
-      { label: "Ver precios", next: "roaming_prices" }
-    ]
-  },
-
-  roaming_prices: {
-    bot: "Consultá precios de roaming desde Mi Personal según el país al que viajás.",
-    options: [
-      { label: "No, gracias", next: "resolved_end" },
-      { label: "Configurar roaming", next: "roaming_config" }
-    ]
-  },
-
-  roaming_config: {
-    bot: "Te comparto una guía para configurar roaming en tu celular antes de viajar.",
-    options: [
-      { label: "Gracias", next: "resolved_end" },
-      { label: "Necesito asesor", next: "tech_advisor" }
-    ]
-  },
-
-  esim_advisor: {
-    bot: "Para solicitar eSIM necesito que un asesor valide la línea.",
+  support_already_tried: {
+    bot: "Entiendo que ya hiciste pruebas previas.\n\nPara continuar, te paso con soporte técnico con el recorrido realizado.",
     advisor: true
   },
 
-  fixed_menu: {
-    bot: "Perfecto.\n\nAntes de seguir, decime, ¿por dónde viene tu consulta?",
-    options: [
-      { label: "Pagos", next: "payments_menu" },
-      { label: "Administrativo", next: "procedures_menu" },
-      { label: "Soporte técnico", next: "tech_support_menu" },
-      { label: "Ventas", next: "sales_advisor" },
-      { label: "Baja", next: "cancellation_advisor" }
-    ]
-  },
-
-  sales_advisor: {
-    bot: "Te paso con un asesor comercial para continuar.",
+  support_advisor: {
+    bot: "Te paso con soporte técnico para continuar el diagnóstico.",
     advisor: true
   },
 
-  cancellation_advisor: {
-    bot: "Te paso con un asesor para gestionar tu solicitud.",
+  // 3. Retención
+  retention_menu: {
+    bot: "Módulo Retención.\n\nAcá no miramos solo la baja: reconstruimos qué la produjo. ¿Qué caso querés simular?",
+    options: [
+      { label: "Quiero dar de baja", next: "retention_cancel_start" },
+      { label: "Me voy por precio", next: "retention_price" },
+      { label: "Me voy porque nunca resolvieron", next: "retention_unresolved" }
+    ]
+  },
+
+  retention_cancel_start: {
+    bot: "Lamento que quieras dar de baja el servicio.\n\nAntes de continuar, puedo revisar alternativas para que sigas con Personal.",
+    options: [
+      { label: "No quiero ofertas", next: "retention_irreversible" },
+      { label: "Escucho alternativas", next: "retention_offer" },
+      { label: "Mi problema no es el precio", next: "retention_unresolved" }
+    ]
+  },
+
+  retention_price: {
+    bot: "Puedo revisar si hay una opción comercial disponible para tu línea o servicio.\n\n¿Querés que lo vea un asesor?",
+    options: [
+      { label: "Sí", next: "retention_offer" },
+      { label: "No, quiero la baja", next: "retention_irreversible" }
+    ]
+  },
+
+  retention_unresolved: {
+    bot: "Entiendo. Cuando la baja viene por un problema no resuelto, necesito que un asesor revise el historial antes de continuar.",
+    advisor: true
+  },
+
+  retention_offer: {
+    bot: "Te paso con un asesor para revisar alternativas comerciales y el motivo de baja informado.",
+    advisor: true
+  },
+
+  retention_irreversible: {
+    bot: "Te paso con un asesor para gestionar la solicitud de baja.",
+    advisor: true
+  },
+
+  // 4. Personal Pay
+  personal_pay_menu: {
+    bot: "Módulo Personal Pay.\n\nAcá el eje es confianza, plata y trazabilidad. ¿Qué caso querés recorrer?",
+    options: [
+      { label: "No se acreditó mi plata", next: "pay_money_not_visible" },
+      { label: "Veo un movimiento desconocido", next: "pay_unknown_movement" },
+      { label: "No me aplicaron cashback", next: "pay_cashback_missing" }
+    ]
+  },
+
+  pay_money_not_visible: {
+    bot: "Si la operación fue reciente, puede demorar en impactar.\n\nRevisá nuevamente más tarde desde la app.",
+    options: [
+      { label: "Necesito saber dónde está la plata", next: "pay_traceability_gap" },
+      { label: "Ya pasó mucho tiempo", next: "pay_advisor" },
+      { label: "Espero", next: "resolved_end" }
+    ]
+  },
+
+  pay_unknown_movement: {
+    bot: "Si no reconocés un movimiento, te recomendamos revisar el detalle desde la app y bloquear preventivamente la cuenta si lo considerás necesario.",
+    options: [
+      { label: "Quiero bloquear", next: "pay_advisor_critical" },
+      { label: "Quiero asesor", next: "pay_advisor_critical" },
+      { label: "Solo quería consultar", next: "resolved_end" }
+    ]
+  },
+
+  pay_cashback_missing: {
+    bot: "El reintegro puede demorar según las condiciones de la promoción.\n\nRevisá bases y condiciones desde la app.",
+    options: [
+      { label: "No encuentro la promo", next: "pay_traceability_gap" },
+      { label: "Quiero asesor", next: "pay_advisor" },
+      { label: "Gracias", next: "resolved_end" }
+    ]
+  },
+
+  pay_traceability_gap: {
+    bot: "No tengo más detalle del estado desde este canal.\n\nTe paso con un asesor para revisar la operación.",
+    advisor: true
+  },
+
+  pay_advisor: {
+    bot: "Te paso con un asesor de Personal Pay para revisar la operación.",
+    advisor: true
+  },
+
+  pay_advisor_critical: {
+    bot: "Te paso con un asesor para revisar el movimiento y tomar una acción preventiva si corresponde.",
+    advisor: true
+  },
+
+  // 5. Prepago y madrugada
+  prepaid_night_menu: {
+    bot: "Módulo Prepago y madrugada.\n\nSon las 03:17. El cliente necesita resolver ahora, no en horario administrativo. ¿Qué caso querés simular?",
+    options: [
+      { label: "Recargué y no impactó", next: "night_topup_not_applied" },
+      { label: "Estoy sin datos", next: "night_no_data" },
+      { label: "Necesito comprar un pack", next: "night_pack_needed" }
+    ]
+  },
+
+  night_topup_not_applied: {
+    bot: "La recarga puede demorar en impactar según el medio de pago utilizado.\n\nTe sugerimos verificar más tarde desde Mi Personal.",
+    options: [
+      { label: "No tengo datos para entrar", next: "night_channel_paradox" },
+      { label: "Necesito usar la línea ahora", next: "night_urgent_advisor" },
+      { label: "Espero", next: "resolved_end" }
+    ]
+  },
+
+  night_no_data: {
+    bot: "Podés consultar y comprar packs desde la app Mi Personal.\n\nTambién podés revisar tu saldo disponible.",
+    options: [
+      { label: "No puedo entrar a la app", next: "night_channel_paradox" },
+      { label: "Comprar pack", next: "night_pack_needed" },
+      { label: "Quiero asesor", next: "night_urgent_advisor" }
+    ]
+  },
+
+  night_pack_needed: {
+    bot: "Para comprar un pack necesitás saldo suficiente o un medio de pago disponible desde Mi Personal.",
+    options: [
+      { label: "No carga la app", next: "night_channel_paradox" },
+      { label: "No tengo saldo", next: "night_low_autonomy" },
+      { label: "Gracias", next: "resolved_end" }
+    ]
+  },
+
+  night_channel_paradox: {
+    bot: "Entiendo. En este momento no puedo completar la gestión desde acá.\n\nTe sugiero intentar nuevamente más tarde o revisar desde Mi Personal cuando tengas conexión.",
+    options: [
+      { label: "Entonces no puedo hacer nada", next: "night_dead_end" },
+      { label: "Quiero asesor", next: "night_urgent_advisor" }
+    ]
+  },
+
+  night_low_autonomy: {
+    bot: "Sin saldo o medio de pago disponible no puedo activar el pack desde este canal.\n\nTe sugiero intentar una nueva recarga.",
+    options: [
+      { label: "Ya recargué y no impactó", next: "night_topup_not_applied" },
+      { label: "Quiero asesor", next: "night_urgent_advisor" }
+    ]
+  },
+
+  night_dead_end: {
+    bot: "Lamento no poder resolverlo desde este canal en este momento.\n\nTe paso con un asesor para revisar alternativas disponibles.",
+    advisor: true
+  },
+
+  night_urgent_advisor: {
+    bot: "Te paso con un asesor. El recorrido indica urgencia horaria y baja autonomía para resolver por autogestión.",
     advisor: true
   },
 
