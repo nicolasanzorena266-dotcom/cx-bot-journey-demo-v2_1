@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Konecta CX Lab</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <section id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="brand-login">
+        <img src="konecta-logo.png" alt="Konecta" class="brand-logo" />
+        <span class="brand-sub">CX Lab</span>
+      </div>
+      <h1>Ingresar al simulador CX</h1>
+      <p>Cargá tu nombre para adaptar la sesión y comenzar a simular recorridos conversacionales.</p>
+      <form id="loginForm" class="login-form">
+        <label for="advisorNameInput">Nombre</label>
+        <input id="advisorNameInput" type="text" placeholder="Ingresá tu nombre" autocomplete="off" />
+        <button type="submit">Ingresar al simulador</button>
+      </form>
+      <small>Demo conceptual. No usa datos reales ni se conecta a sistemas productivos.</small>
+    </div>
+  </section>
+
+  <main id="app" class="app hidden" aria-label="Konecta CX Lab">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="konecta-logo.png" alt="Konecta" class="brand-logo" />
+        <span class="brand-sub">CX Lab</span>
+      </div>
+
+      <nav class="side-nav" aria-label="Navegación principal">
+        <button class="nav-item active" data-view="inicio"><span class="nav-icon">⌂</span><span>Inicio</span></button>
+        <button class="nav-item" data-view="conversaciones"><span class="nav-icon">☰</span><span>Conversaciones</span></button>
+        <button class="nav-item" data-view="reportes"><span class="nav-icon">▥</span><span>Reportes</span></button>
+        <button class="nav-item" data-view="conocimiento"><span class="nav-icon">⌑</span><span>Conocimiento</span></button>
+        <button class="nav-item" data-view="configuracion"><span class="nav-icon">⚙</span><span>Configuración</span></button>
+      </nav>
+
+      <div class="module-section">
+        <p class="section-title">MÓDULOS CX</p>
+        <button class="module-card sales" data-module="ventas">
+          <span class="module-icon">▣</span>
+          <span>Ventas</span>
+        </button>
+        <button class="module-card onboarding" data-module="onboarding">
+          <span class="module-icon">◆</span>
+          <span>Onboarding</span>
+        </button>
+        <button class="module-card support" data-module="soporte">
+          <span class="module-icon">☎</span>
+          <span>Soporte</span>
+        </button>
+        <button class="module-card retention" data-module="retencion">
+          <span class="module-icon">⟳</span>
+          <span>Retención</span>
+        </button>
+      </div>
+
+      <div class="sidebar-footer">© 2026 Konecta CX Lab</div>
+    </aside>
+
+    <section class="workspace">
+      <header class="topbar">
+        <div>
+          <h1>¡Hola, <span id="advisorGreeting">Nicolás</span>! 👋</h1>
+          <p>Acá comienza cada conversación, acá empieza cada experiencia.</p>
+        </div>
+        <div class="top-user">
+          <div class="user-text">
+            <strong id="advisorProfileName">Nicolás</strong>
+            <span>Asesor CX</span>
+            <small><i></i> Conectado</small>
+          </div>
+          <div class="user-avatar">●</div>
+        </div>
+      </header>
+
+      <div class="toolbar">
+        <button id="newSimulationBtn" class="tool-btn"><span>▣</span> Nueva simulación</button>
+        <button id="diagnosticBtn" class="tool-btn dark"><span>◇</span> Diagnóstico CX</button>
+        <button id="csvBtn" class="tool-btn secondary"><span>⇩</span> Descargar CSV</button>
+      </div>
+
+      <div class="main-grid">
+        <section class="phone-shell" aria-label="Chat simulado">
+          <div class="phone-status">
+            <span>11:42</span>
+            <span>▂ ▃ ▅  ◔ ▰</span>
+          </div>
+          <div class="phone-header">
+            <span class="back">‹</span>
+            <div class="p-avatar">K</div>
+            <div>
+              <strong>Asistente CX</strong>
+              <small>Simulador CX</small>
+            </div>
+            <span class="dots">⋮</span>
+          </div>
+          <div id="chat" class="chat"></div>
+          <div id="options" class="chat-options"></div>
+          <form id="textForm" class="composer">
+            <span>☺</span>
+            <input id="textInput" type="text" placeholder="Escribí un mensaje..." autocomplete="off" />
+            <button type="submit" aria-label="Enviar">➤</button>
+          </form>
+        </section>
+
+        <aside class="advisor-panel">
+          <div class="advisor-title-row">
+            <h2>Contexto para el asesor</h2>
+            <span id="contextBadge" class="context-badge waiting">En espera</span>
+          </div>
+          <div id="advisorCard" class="advisor-card empty-card">
+            <h3>Seleccioná un módulo para iniciar</h3>
+            <p>La card se completará con el contexto capturado durante el recorrido.</p>
+          </div>
+          <div id="actionBox" class="action-box hidden">
+            <h3>💡 Acción sugerida</h3>
+            <p id="actionSuggestion"></p>
+          </div>
+        </aside>
+      </div>
+
+      <footer class="legal-note">◇ Los datos mostrados son ficticios y de uso exclusivo para simulación de experiencia del cliente.</footer>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <button id="modalClose" class="modal-close">×</button>
+      <h2 id="modalTitle">Título</h2>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
