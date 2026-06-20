@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CX Bot Journey Demo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="layout">
+    <section class="panel intro">
+      <h1>CX Bot Journey Demo</h1>
+      <p>
+        Simulador conversacional estilo WhatsApp para medir esfuerzo del cliente en recorridos de bot.
+      </p>
+      <p class="muted">
+        Demo basada en un flujo de atención con identificación, selección de servicio, menú y submenús.
+        No usa datos reales.
+      </p>
+
+      <div class="actions">
+        <button id="restartBtn" class="secondary">Reiniciar caso</button>
+        <button id="reportBtn">Generar métricas</button>
+        <button id="advisorSuggestionBtn">Sugerencia asesor</button>
+        <button id="csvBtn" class="secondary">Descargar CSV</button>
+      </div>
+
+      <div id="summary" class="summary hidden"></div>
+    </section>
+
+    <section class="phone">
+      <div class="phone-header">
+        <div class="avatar">P</div>
+        <div>
+          <strong>Pía · Demo Bot</strong>
+          <span>en línea</span>
+        </div>
+      </div>
+
+      <div id="chat" class="chat"></div>
+
+      <div id="options" class="options"></div>
+
+      <form id="textForm" class="composer">
+        <input id="textInput" type="text" placeholder="Escribí un mensaje..." autocomplete="off" />
+        <button type="submit">Enviar</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="flow.js"></script>
+  <script src="context-pass.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
