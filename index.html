@@ -3,61 +3,97 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CX Journey Forensics Demo</title>
+  <title>Personal CX Lab · Journey Demo</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="layout">
-    <section class="panel intro">
-      <p class="eyebrow">Personal CX Lab</p>
-      <h1>CX Journey Forensics Demo</h1>
-      <p>
-        Simulador conversacional estilo WhatsApp para atravesar escenarios críticos,
-        medir esfuerzo y detectar genes de fricción durante el recorrido.
-      </p>
-      <p class="muted">
-        Demo conceptual basada en recorridos de atención. No usa datos reales, no se conecta
-        a sistemas productivos y sirve para presentar hipótesis de mejora antes de implementarlas.
-      </p>
-
-      <div class="module-order" aria-label="Módulos del análisis">
-        <span>Ventas · Onboarding</span>
-        <span>Soporte</span>
-        <span>Retención</span>
-        <span>Personal Pay</span>
-        <span>Prepago · Madrugada</span>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navegación CX Lab">
+      <div class="brand">
+        <strong>personal</strong>
+        <span>CX Lab</span>
       </div>
 
-      <div class="actions">
-        <button id="restartBtn" class="secondary">Reiniciar caso</button>
-        <button id="reportBtn">Generar métricas</button>
-        <button id="forensicBtn">Análisis forense</button>
-        <button id="advisorSuggestionBtn">Sugerencia asesor</button>
-        <button id="csvBtn" class="secondary">Descargar CSV</button>
+      <nav class="nav-list" aria-label="Secciones">
+        <button class="nav-item active"><span>⌂</span>Inicio</button>
+        <button class="nav-item"><span>◌</span>Conversaciones</button>
+        <button class="nav-item"><span>▣</span>Casos</button>
+        <button class="nav-item"><span>◇</span>Alertas CX</button>
+        <button class="nav-item"><span>▥</span>Reportes</button>
+      </nav>
+
+      <div class="module-box">
+        <p class="module-title">Flujos a simular</p>
+        <button class="module-chip sales" data-module="Ventas">Ventas</button>
+        <button class="module-chip onboarding" data-module="Onboarding">Onboarding</button>
+        <button class="module-chip support" data-module="Soporte">Soporte</button>
+        <button class="module-chip prepaid" data-module="Prepago">Prepago</button>
+        <button class="module-chip overnight" data-module="Overnight">Overnight</button>
+        <button class="module-chip retention" data-module="Retención">Retención</button>
       </div>
 
-      <div id="summary" class="summary hidden"></div>
-    </section>
+      <p class="sidebar-foot">Demo conceptual · No usa datos reales</p>
+    </aside>
 
-    <section class="phone" aria-label="Simulador de chat">
-      <div class="phone-header">
-        <div class="avatar">P</div>
+    <main class="workspace">
+      <header class="topbar">
         <div>
-          <strong>Pía · Demo Bot</strong>
-          <span>en línea</span>
+          <p class="eyebrow">Personal CX Lab</p>
+          <h1>CX Journey Demo</h1>
+          <p>Simulador conversacional para recorrer flujos, capturar contexto y generar una card operativa para el asesor.</p>
         </div>
-      </div>
+        <div class="top-actions">
+          <button id="restartBtn" class="btn secondary">Reiniciar caso</button>
+          <button id="reportBtn" class="btn ghost">Métricas</button>
+          <button id="csvBtn" class="btn primary">Descargar CSV</button>
+        </div>
+      </header>
 
-      <div id="chat" class="chat"></div>
+      <section class="sim-area">
+        <section class="phone" aria-label="Simulador de chat">
+          <div class="phone-header">
+            <div class="avatar">P</div>
+            <div>
+              <strong>Pía · Demo Bot</strong>
+              <span>en línea</span>
+            </div>
+            <div class="phone-menu">⋮</div>
+          </div>
 
-      <div id="options" class="options"></div>
+          <div id="chat" class="chat"></div>
+          <div id="options" class="options"></div>
 
-      <form id="textForm" class="composer">
-        <input id="textInput" type="text" placeholder="Escribí un mensaje..." autocomplete="off" />
-        <button type="submit">Enviar</button>
-      </form>
-    </section>
-  </main>
+          <form id="textForm" class="composer">
+            <input id="textInput" type="text" placeholder="Escribí un mensaje..." autocomplete="off" />
+            <button type="submit" aria-label="Enviar">➤</button>
+          </form>
+        </section>
+
+        <aside class="advisor-panel" aria-label="Card para asesor">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Context Pass</p>
+              <h2>Card para el asesor</h2>
+            </div>
+            <span id="contextStatus" class="status-pill waiting">En espera</span>
+          </div>
+
+          <div id="advisorCard" class="empty-state">
+            <div class="empty-icon">▧</div>
+            <h3>Sin contexto todavía</h3>
+            <p>Elegí un flujo y avanzá el recorrido. Cuando el bot derive a asesor, la card se completa con los datos capturados.</p>
+          </div>
+
+          <div class="panel-actions">
+            <button id="advisorSuggestionBtn" class="btn ghost">Sugerencia asesor</button>
+            <button id="forensicBtn" class="btn dark">Análisis CX</button>
+          </div>
+
+          <div id="summary" class="summary hidden"></div>
+        </aside>
+      </section>
+    </main>
+  </div>
 
   <script src="flow.js"></script>
   <script src="context-pass.js"></script>

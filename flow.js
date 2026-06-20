@@ -1,265 +1,311 @@
 const FLOW = {
   start: {
-    bot: "¡Hola! Soy Pía, tu línea directa con Personal 😎\n\nEste demo simula recorridos críticos para detectar fricción CX.\n\nPara empezar, escribime un DNI o CUIT ficticio, sin puntos ni guiones. ✍️",
+    module: "Demo",
+    bot: "¡Hola! Soy Pía, tu línea directa con Personal 😎\n\nEsta demo permite simular flujos críticos y visualizar el contexto que debería recibir el asesor.\n\nElegí el flujo que querés simular:",
+    options: [
+      { label: "Ventas", next: "sales_dni", set: { module: "Ventas" } },
+      { label: "Onboarding", next: "onboarding_dni", set: { module: "Onboarding" } },
+      { label: "Soporte", next: "support_dni", set: { module: "Soporte" } },
+      { label: "Prepago", next: "prepaid_pending", set: { module: "Prepago" } },
+      { label: "Overnight", next: "overnight_pending", set: { module: "Overnight" } },
+      { label: "Retención", next: "retention_dni", set: { module: "Retención" } }
+    ]
+  },
+
+  sales_dni: {
+    module: "Ventas",
+    bot: "Escribime el DNI o CUIT asociado al servicio.",
     input: true,
-    next: "service_menu"
+    inputKey: "dniCuit",
+    next: "sales_product"
   },
-
-  service_menu: {
-    bot: "Bien. 😊\n\nElegí el módulo que querés recorrer:",
+  sales_product: {
+    module: "Ventas",
+    bot: "¿Qué servicio o producto querés contratar o modificar?",
     options: [
-      { label: "Ventas - Onboarding del masivo", next: "onboarding_menu" },
-      { label: "Soporte", next: "support_menu" },
-      { label: "Retención", next: "retention_menu" },
-      { label: "Personal Pay", next: "personal_pay_menu" },
-      { label: "Prepago y madrugada", next: "prepaid_night_menu" }
+      { label: "Internet / TV", next: "sales_advisor", set: { requestedProduct: "Internet / TV" } },
+      { label: "Línea móvil", next: "sales_advisor", set: { requestedProduct: "Línea móvil" } },
+      { label: "Combo / Conexión Total", next: "sales_advisor", set: { requestedProduct: "Combo / Conexión Total" } },
+      { label: "Portabilidad", next: "sales_advisor", set: { requestedProduct: "Portabilidad" } },
+      { label: "Equipo contra factura", next: "sales_advisor", set: { requestedProduct: "Equipo contra factura" } },
+      { label: "Línea adicional", next: "sales_advisor", set: { requestedProduct: "Línea adicional" } },
+      { label: "Reposición de SIM / recuperar línea", next: "sales_advisor", set: { requestedProduct: "Reposición de SIM / recuperar línea" } },
+      { label: "Otro producto / servicio", next: "sales_other_product", set: { requestedProduct: "Otro producto / servicio" } }
     ]
   },
+  sales_other_product: {
+    module: "Ventas",
+    bot: "Contame brevemente qué producto o servicio necesitás.",
+    input: true,
+    inputKey: "requestedProductDetail",
+    next: "sales_advisor"
+  },
+  sales_advisor: {
+    module: "Ventas",
+    bot: "Perfecto. Te paso con un asesor comercial para continuar la gestión.",
+    advisor: true,
+    advisorType: "sales"
+  },
 
-  // 1. Ventas - Onboarding masivo
-  onboarding_menu: {
-    bot: "Módulo Ventas - Onboarding del masivo.\n\nAcá miramos la brecha entre comprar y empezar a ser cliente. ¿Qué caso querés simular?",
+  onboarding_dni: {
+    module: "Onboarding",
+    bot: "Escribime el DNI o CUIT asociado al servicio.",
+    input: true,
+    inputKey: "dniCuit",
+    next: "onboarding_service_type"
+  },
+  onboarding_service_type: {
+    module: "Onboarding",
+    bot: "¿Qué tipo de servicio adquiriste recientemente?",
     options: [
-      { label: "Compré y no sé si quedó activo", next: "onboarding_activation_unclear" },
-      { label: "Me prometieron algo distinto", next: "onboarding_promise_gap" },
-      { label: "No sé cuál es el próximo paso", next: "onboarding_next_step_unclear" }
+      { label: "Internet / TV", next: "onboarding_address", set: { serviceType: "Internet / TV" } },
+      { label: "Telefonía fija", next: "onboarding_address", set: { serviceType: "Telefonía fija" } },
+      { label: "Línea móvil", next: "onboarding_mobile_line", set: { serviceType: "Línea móvil" } }
     ]
   },
-
-  onboarding_activation_unclear: {
-    bot: "Veo una solicitud comercial iniciada.\n\nLa activación puede demorar y te vamos a avisar cuando esté disponible. Mientras tanto, podés consultar el estado desde Mi Personal.",
+  onboarding_address: {
+    module: "Onboarding",
+    bot: "¿Cuál es el domicilio donde tenés instalado el servicio?",
+    input: true,
+    inputKey: "address",
+    next: "onboarding_reason"
+  },
+  onboarding_mobile_line: {
+    module: "Onboarding",
+    bot: "¿Cuál es el número de línea asociado a la consulta?",
+    input: true,
+    inputKey: "mobileLine",
+    next: "onboarding_reason"
+  },
+  onboarding_reason: {
+    module: "Onboarding",
+    bot: "Detectamos que tu servicio fue adquirido recientemente.\n\nPara ayudarte con la primera factura, indicame cuál de estas situaciones querés revisar:",
     options: [
-      { label: "Pero ya me dijeron que estaba activo", next: "onboarding_promise_gap" },
-      { label: "No puedo ver el estado", next: "onboarding_no_tracking" },
-      { label: "Quiero hablar con asesor", next: "onboarding_advisor" }
+      { label: "Precio/promoción no coincidente", next: "onboarding_sale_amount", set: { subReason: "Precio/promoción no coincidente" } },
+      { label: "Proporcional no comprendido", next: "onboarding_sale_amount", set: { subReason: "Proporcional no comprendido" } },
+      { label: "Bonificación/descuento no visualizado", next: "onboarding_sale_amount", set: { subReason: "Bonificación/descuento no visualizado" } }
     ]
   },
-
-  onboarding_promise_gap: {
-    bot: "Entiendo. Para revisar la condición comercial y el estado de activación, necesito pasarte con un asesor.",
-    advisor: true
+  onboarding_sale_amount: {
+    module: "Onboarding",
+    bot: "¿Qué importe te informaron al momento de la venta?",
+    input: true,
+    inputKey: "saleAmount",
+    next: "onboarding_invoice_amount"
   },
-
-  onboarding_next_step_unclear: {
-    bot: "Después de la compra, tenés que esperar la confirmación de activación.\n\nSi corresponde instalación o validación adicional, te vamos a contactar.",
+  onboarding_invoice_amount: {
+    module: "Onboarding",
+    bot: "¿Qué importe ves actualmente en la factura?",
+    input: true,
+    inputKey: "invoiceAmount",
+    next: "onboarding_promo"
+  },
+  onboarding_promo: {
+    module: "Onboarding",
+    bot: "¿Qué promo, bonificación o descuento te habían informado?",
+    input: true,
+    inputKey: "promoInfo",
+    next: "onboarding_channel"
+  },
+  onboarding_channel: {
+    module: "Onboarding",
+    bot: "¿A través de qué canal te realizaron la oferta?",
     options: [
-      { label: "¿Cuándo?", next: "onboarding_no_tracking" },
-      { label: "No me sirve esa respuesta", next: "onboarding_advisor" },
-      { label: "Gracias", next: "resolved_end" }
+      { label: "Llamada", next: "onboarding_advisor", set: { offerChannel: "Llamada" } },
+      { label: "WhatsApp", next: "onboarding_advisor", set: { offerChannel: "WhatsApp" } },
+      { label: "Mail", next: "onboarding_advisor", set: { offerChannel: "Mail" } },
+      { label: "Presencial / local", next: "onboarding_advisor", set: { offerChannel: "Presencial / local" } },
+      { label: "Web / app", next: "onboarding_advisor", set: { offerChannel: "Web / app" } },
+      { label: "No recuerdo", next: "onboarding_advisor", set: { offerChannel: "No recuerda" } }
     ]
   },
-
-  onboarding_no_tracking: {
-    bot: "Todavía no tengo un estado más detallado para mostrarte desde este canal.\n\nTe paso con un asesor para que revise la solicitud.",
-    advisor: true
-  },
-
   onboarding_advisor: {
-    bot: "Te paso con un asesor para revisar la venta, la promesa comercial y el estado de activación.",
-    advisor: true
+    module: "Onboarding",
+    bot: "Gracias. Con esta información te paso con un asesor de Onboarding para revisar la inconsistencia comercial.",
+    advisor: true,
+    advisorType: "onboarding"
   },
 
-  // 2. Soporte
-  support_menu: {
-    bot: "Módulo Soporte.\n\nAcá miramos diagnóstico, handoff y repetición de pruebas. ¿Qué caso querés recorrer?",
+  support_dni: {
+    module: "Soporte",
+    bot: "Escribime el DNI o CUIT asociado al servicio.",
+    input: true,
+    inputKey: "dniCuit",
+    next: "support_service_type"
+  },
+  support_service_type: {
+    module: "Soporte",
+    bot: "¿Qué tipo de servicio tenés?",
     options: [
-      { label: "Sin servicio", next: "support_no_service" },
-      { label: "Internet lento", next: "support_slow_service" },
-      { label: "Ya pasé por el bot", next: "support_already_tried" }
+      { label: "Internet / TV", next: "support_real_menu", set: { serviceType: "Internet / TV" } },
+      { label: "Telefonía fija", next: "support_real_menu", set: { serviceType: "Telefonía fija" } },
+      { label: "Línea móvil", next: "support_real_menu", set: { serviceType: "Línea móvil" } }
     ]
   },
-
-  support_no_service: {
-    bot: "Vamos a revisar tu servicio.\n\nPrimero reiniciá el módem y esperá 2 minutos. ¿Volvió la conexión?",
+  support_real_menu: {
+    module: "Soporte",
+    bot: "¿Por dónde viene tu consulta?",
     options: [
-      { label: "Sí", next: "resolved_end" },
-      { label: "No", next: "support_repeated_test" },
-      { label: "Ya lo hice antes", next: "support_already_tried" }
+      { label: "Facturación", next: "non_support_route", set: { realMenu: "Facturación" } },
+      { label: "Pagos", next: "non_support_route", set: { realMenu: "Pagos" } },
+      { label: "Trámites", next: "non_support_route", set: { realMenu: "Trámites" } },
+      { label: "Soporte técnico", next: "support_problem", set: { realMenu: "Soporte técnico" } },
+      { label: "Ventas", next: "non_support_route", set: { realMenu: "Ventas" } },
+      { label: "Baja", next: "retention_reason", set: { realMenu: "Baja", module: "Retención" } }
     ]
   },
-
-  support_slow_service: {
-    bot: "Probá acercarte al módem o conectarte por cable para descartar señal WiFi.\n\n¿Mejoró?",
+  non_support_route: {
+    module: "Soporte",
+    bot: "Para esta demo estamos recorriendo Soporte técnico. Volvamos al motivo técnico para continuar.",
     options: [
-      { label: "Sí", next: "resolved_end" },
-      { label: "No", next: "support_repeated_test" },
-      { label: "Necesito asesor", next: "support_advisor" }
+      { label: "Ir a Soporte técnico", next: "support_problem", set: { realMenu: "Soporte técnico" } }
     ]
   },
-
-  support_repeated_test: {
-    bot: "Si el problema continúa, necesito derivarte a soporte técnico para revisar la línea y el equipo instalado.",
-    advisor: true
+  support_problem: {
+    module: "Soporte",
+    bot: "¿Qué inconveniente técnico tenés?",
+    options: [
+      { label: "Sin servicio", next: "support_location_router", set: { technicalIssue: "Sin servicio" } },
+      { label: "Servicio intermitente / microcortes", next: "support_location_router", set: { technicalIssue: "Servicio intermitente / microcortes" } },
+      { label: "Lentitud", next: "support_location_router", set: { technicalIssue: "Lentitud" } },
+      { label: "Problema con TV / Flow", next: "support_location_router", set: { technicalIssue: "Problema con TV / Flow" } },
+      { label: "Telefonía fija sin funcionamiento", next: "support_location_router", set: { technicalIssue: "Telefonía fija sin funcionamiento" } },
+      { label: "Visita técnica incumplida", next: "support_location_router", set: { technicalIssue: "Visita técnica incumplida" } },
+      { label: "Ya reclamé y sigue igual", next: "support_location_router", set: { technicalIssue: "Ya reclamé y sigue igual" } },
+      { label: "No puedo avanzar por bot/app", next: "support_location_router", set: { technicalIssue: "No puedo avanzar por bot/app" } }
+    ]
   },
-
-  support_already_tried: {
-    bot: "Entiendo que ya hiciste pruebas previas.\n\nPara continuar, te paso con soporte técnico con el recorrido realizado.",
-    advisor: true
+  support_location_router: {
+    module: "Soporte",
+    bot: "Voy a pedirte un dato para ubicar el servicio afectado.",
+    autoNext: true,
+    router: "serviceLocation"
   },
-
+  support_address: {
+    module: "Soporte",
+    bot: "¿Cuál es el domicilio donde tenés instalado el servicio?",
+    input: true,
+    inputKey: "address",
+    next: "support_start_date"
+  },
+  support_mobile_line: {
+    module: "Soporte",
+    bot: "¿Cuál es el número de línea afectada?",
+    input: true,
+    inputKey: "mobileLine",
+    next: "support_start_date"
+  },
+  support_start_date: {
+    module: "Soporte",
+    bot: "¿Desde cuándo ocurre el inconveniente?",
+    input: true,
+    inputKey: "issueStartDate",
+    next: "support_tests"
+  },
+  support_tests: {
+    module: "Soporte",
+    bot: "¿Qué pruebas ya realizaste?",
+    options: [
+      { label: "Reinicié el módem", next: "support_advisor", set: { testsDone: "Reinició el módem" } },
+      { label: "Revisé cables/conexiones", next: "support_advisor", set: { testsDone: "Revisó cables/conexiones" } },
+      { label: "Probé con otro dispositivo", next: "support_advisor", set: { testsDone: "Probó con otro dispositivo" } },
+      { label: "Ya hice pruebas con el bot/app", next: "support_advisor", set: { testsDone: "Ya hizo pruebas con el bot/app" } },
+      { label: "No realicé pruebas", next: "support_advisor", set: { testsDone: "No realizó pruebas" } },
+      { label: "Otra", next: "support_other_test", set: { testsDone: "Otra" } }
+    ]
+  },
+  support_other_test: {
+    module: "Soporte",
+    bot: "Contame brevemente qué prueba realizaste.",
+    input: true,
+    inputKey: "testsDoneDetail",
+    next: "support_advisor"
+  },
   support_advisor: {
-    bot: "Te paso con soporte técnico para continuar el diagnóstico.",
-    advisor: true
+    module: "Soporte",
+    bot: "Gracias. Te paso con soporte técnico con el contexto del inconveniente para evitar reiniciar el diagnóstico desde cero.",
+    advisor: true,
+    advisorType: "support"
   },
 
-  // 3. Retención
-  retention_menu: {
-    bot: "Módulo Retención.\n\nAcá no miramos solo la baja: reconstruimos qué la produjo. ¿Qué caso querés simular?",
+  retention_dni: {
+    module: "Retención",
+    bot: "Escribime el DNI o CUIT asociado al servicio.",
+    input: true,
+    inputKey: "dniCuit",
+    next: "retention_service_type"
+  },
+  retention_service_type: {
+    module: "Retención",
+    bot: "¿Qué tipo de servicio tenés?",
     options: [
-      { label: "Quiero dar de baja", next: "retention_cancel_start" },
-      { label: "Me voy por precio", next: "retention_price" },
-      { label: "Me voy porque nunca resolvieron", next: "retention_unresolved" }
+      { label: "Internet / TV", next: "retention_real_menu", set: { serviceType: "Internet / TV" } },
+      { label: "Telefonía fija", next: "retention_real_menu", set: { serviceType: "Telefonía fija" } },
+      { label: "Línea móvil", next: "retention_real_menu", set: { serviceType: "Línea móvil" } }
     ]
   },
-
-  retention_cancel_start: {
-    bot: "Lamento que quieras dar de baja el servicio.\n\nAntes de continuar, puedo revisar alternativas para que sigas con Personal.",
+  retention_real_menu: {
+    module: "Retención",
+    bot: "¿Por dónde viene tu consulta?",
     options: [
-      { label: "No quiero ofertas", next: "retention_irreversible" },
-      { label: "Escucho alternativas", next: "retention_offer" },
-      { label: "Mi problema no es el precio", next: "retention_unresolved" }
+      { label: "Facturación", next: "retention_to_baja_hint", set: { realMenu: "Facturación" } },
+      { label: "Pagos", next: "retention_to_baja_hint", set: { realMenu: "Pagos" } },
+      { label: "Trámites", next: "retention_to_baja_hint", set: { realMenu: "Trámites" } },
+      { label: "Soporte técnico", next: "retention_to_baja_hint", set: { realMenu: "Soporte técnico" } },
+      { label: "Ventas", next: "retention_to_baja_hint", set: { realMenu: "Ventas" } },
+      { label: "Baja", next: "retention_reason", set: { realMenu: "Baja" } }
     ]
   },
-
-  retention_price: {
-    bot: "Puedo revisar si hay una opción comercial disponible para tu línea o servicio.\n\n¿Querés que lo vea un asesor?",
+  retention_to_baja_hint: {
+    module: "Retención",
+    bot: "Para esta demo estamos recorriendo Retención. Sigamos por la solicitud de baja.",
     options: [
-      { label: "Sí", next: "retention_offer" },
-      { label: "No, quiero la baja", next: "retention_irreversible" }
+      { label: "Ir a Baja", next: "retention_reason", set: { realMenu: "Baja" } }
     ]
   },
-
-  retention_unresolved: {
-    bot: "Entiendo. Cuando la baja viene por un problema no resuelto, necesito que un asesor revise el historial antes de continuar.",
-    advisor: true
-  },
-
-  retention_offer: {
-    bot: "Te paso con un asesor para revisar alternativas comerciales y el motivo de baja informado.",
-    advisor: true
-  },
-
-  retention_irreversible: {
-    bot: "Te paso con un asesor para gestionar la solicitud de baja.",
-    advisor: true
-  },
-
-  // 4. Personal Pay
-  personal_pay_menu: {
-    bot: "Módulo Personal Pay.\n\nAcá el eje es confianza, plata y trazabilidad. ¿Qué caso querés recorrer?",
+  retention_reason: {
+    module: "Retención",
+    bot: "¿Cuál es el motivo de tu solicitud?",
     options: [
-      { label: "No se acreditó mi plata", next: "pay_money_not_visible" },
-      { label: "Veo un movimiento desconocido", next: "pay_unknown_movement" },
-      { label: "No me aplicaron cashback", next: "pay_cashback_missing" }
+      { label: "Aumento del servicio / precio", next: "retention_advisor", set: { retentionReason: "Aumento del servicio / precio" } },
+      { label: "Oferta de otra compañía", next: "retention_advisor", set: { retentionReason: "Oferta de otra compañía" } },
+      { label: "Falla técnica no resuelta", next: "retention_advisor", set: { retentionReason: "Falla técnica no resuelta" } },
+      { label: "No uso el servicio", next: "retention_advisor", set: { retentionReason: "No uso el servicio" } },
+      { label: "Quiero bajar el costo / reducir servicios", next: "retention_advisor", set: { retentionReason: "Quiero bajar el costo / reducir servicios" } },
+      { label: "Gestión previa no resuelta", next: "retention_advisor", set: { retentionReason: "Gestión previa no resuelta" } },
+      { label: "Mudanza", next: "retention_advisor", set: { retentionReason: "Mudanza" } },
+      { label: "Otro motivo", next: "retention_other_reason", set: { retentionReason: "Otro motivo" } }
     ]
   },
-
-  pay_money_not_visible: {
-    bot: "Si la operación fue reciente, puede demorar en impactar.\n\nRevisá nuevamente más tarde desde la app.",
-    options: [
-      { label: "Necesito saber dónde está la plata", next: "pay_traceability_gap" },
-      { label: "Ya pasó mucho tiempo", next: "pay_advisor" },
-      { label: "Espero", next: "resolved_end" }
-    ]
+  retention_other_reason: {
+    module: "Retención",
+    bot: "Contame brevemente el motivo de la solicitud.",
+    input: true,
+    inputKey: "retentionReasonDetail",
+    next: "retention_advisor"
+  },
+  retention_advisor: {
+    module: "Retención",
+    bot: "Te paso con un asesor para continuar la gestión desde el motivo declarado.",
+    advisor: true,
+    advisorType: "retention"
   },
 
-  pay_unknown_movement: {
-    bot: "Si no reconocés un movimiento, te recomendamos revisar el detalle desde la app y bloquear preventivamente la cuenta si lo considerás necesario.",
-    options: [
-      { label: "Quiero bloquear", next: "pay_advisor_critical" },
-      { label: "Quiero asesor", next: "pay_advisor_critical" },
-      { label: "Solo quería consultar", next: "resolved_end" }
-    ]
+  prepaid_pending: {
+    module: "Prepago",
+    bot: "El flujo Prepago queda pendiente de definición.\n\nEn esta versión se deja visible como módulo para mantener el mapa completo del recorrido.",
+    advisor: true,
+    advisorType: "pending"
   },
-
-  pay_cashback_missing: {
-    bot: "El reintegro puede demorar según las condiciones de la promoción.\n\nRevisá bases y condiciones desde la app.",
-    options: [
-      { label: "No encuentro la promo", next: "pay_traceability_gap" },
-      { label: "Quiero asesor", next: "pay_advisor" },
-      { label: "Gracias", next: "resolved_end" }
-    ]
-  },
-
-  pay_traceability_gap: {
-    bot: "No tengo más detalle del estado desde este canal.\n\nTe paso con un asesor para revisar la operación.",
-    advisor: true
-  },
-
-  pay_advisor: {
-    bot: "Te paso con un asesor de Personal Pay para revisar la operación.",
-    advisor: true
-  },
-
-  pay_advisor_critical: {
-    bot: "Te paso con un asesor para revisar el movimiento y tomar una acción preventiva si corresponde.",
-    advisor: true
-  },
-
-  // 5. Prepago y madrugada
-  prepaid_night_menu: {
-    bot: "Módulo Prepago y madrugada.\n\nSon las 03:17. El cliente necesita resolver ahora, no en horario administrativo. ¿Qué caso querés simular?",
-    options: [
-      { label: "Recargué y no impactó", next: "night_topup_not_applied" },
-      { label: "Estoy sin datos", next: "night_no_data" },
-      { label: "Necesito comprar un pack", next: "night_pack_needed" }
-    ]
-  },
-
-  night_topup_not_applied: {
-    bot: "La recarga puede demorar en impactar según el medio de pago utilizado.\n\nTe sugerimos verificar más tarde desde Mi Personal.",
-    options: [
-      { label: "No tengo datos para entrar", next: "night_channel_paradox" },
-      { label: "Necesito usar la línea ahora", next: "night_urgent_advisor" },
-      { label: "Espero", next: "resolved_end" }
-    ]
-  },
-
-  night_no_data: {
-    bot: "Podés consultar y comprar packs desde la app Mi Personal.\n\nTambién podés revisar tu saldo disponible.",
-    options: [
-      { label: "No puedo entrar a la app", next: "night_channel_paradox" },
-      { label: "Comprar pack", next: "night_pack_needed" },
-      { label: "Quiero asesor", next: "night_urgent_advisor" }
-    ]
-  },
-
-  night_pack_needed: {
-    bot: "Para comprar un pack necesitás saldo suficiente o un medio de pago disponible desde Mi Personal.",
-    options: [
-      { label: "No carga la app", next: "night_channel_paradox" },
-      { label: "No tengo saldo", next: "night_low_autonomy" },
-      { label: "Gracias", next: "resolved_end" }
-    ]
-  },
-
-  night_channel_paradox: {
-    bot: "Entiendo. En este momento no puedo completar la gestión desde acá.\n\nTe sugiero intentar nuevamente más tarde o revisar desde Mi Personal cuando tengas conexión.",
-    options: [
-      { label: "Entonces no puedo hacer nada", next: "night_dead_end" },
-      { label: "Quiero asesor", next: "night_urgent_advisor" }
-    ]
-  },
-
-  night_low_autonomy: {
-    bot: "Sin saldo o medio de pago disponible no puedo activar el pack desde este canal.\n\nTe sugiero intentar una nueva recarga.",
-    options: [
-      { label: "Ya recargué y no impactó", next: "night_topup_not_applied" },
-      { label: "Quiero asesor", next: "night_urgent_advisor" }
-    ]
-  },
-
-  night_dead_end: {
-    bot: "Lamento no poder resolverlo desde este canal en este momento.\n\nTe paso con un asesor para revisar alternativas disponibles.",
-    advisor: true
-  },
-
-  night_urgent_advisor: {
-    bot: "Te paso con un asesor. El recorrido indica urgencia horaria y baja autonomía para resolver por autogestión.",
-    advisor: true
+  overnight_pending: {
+    module: "Overnight",
+    bot: "El flujo Overnight queda pendiente de definición.\n\nEn esta versión se deja visible como módulo para trabajar luego el journey de atención fuera de horario.",
+    advisor: true,
+    advisorType: "pending"
   },
 
   resolved_end: {
+    module: "Demo",
     bot: "Gracias por comunicarte. Me alegra haberte ayudado. 😊",
     resolved: true
   }
