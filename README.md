@@ -1,55 +1,33 @@
-# Personal CX Lab Demo v5
+# Personal CX Lab Demo
 
-Demo visual de simulador CX con estética tipo dashboard:
+Simulador CX de recorridos conversacionales para Personal.
 
-- pantalla inicial para ingresar el nombre del asesor;
-- sidebar izquierda con módulos CX;
-- chat central tipo WhatsApp;
-- card derecha para el asesor;
-- flujos separados para Ventas, Onboarding, Soporte y Retención;
-- Personal Pay eliminado;
-- Prepago y Overnight visibles como pendientes.
+## Incluye
 
-## Flujos cargados
+- Login inicial estético con nombre dinámico del asesor.
+- Dashboard con estética tipo Personal CX Lab.
+- Sidebar funcional con Inicio, Conversaciones, Casos, Alertas CX, Reportes, Conocimiento y Configuración.
+- Módulos CX separados: Ventas, Onboarding, Soporte y Retención.
+- Chat central estilo WhatsApp.
+- Panel derecho de Contexto para el asesor.
+- Botón Diagnóstico CX.
+- Exportación CSV.
+
+## Módulos
 
 ### Ventas
-- DNI/CUIT
-- Servicio / producto solicitado
-- Derivación al asesor
-
-No infiere fricción, riesgo ni punto de quiebre.
+Captura mínima: DNI/CUIT y servicio/producto solicitado.
+No infiere riesgo ni fricción.
 
 ### Onboarding
-- DNI/CUIT
-- Tipo de servicio
-- Domicilio o línea
-- Submotivo de inconsistencia entre oferta comercial y primera factura
-- Importe informado en venta
-- Importe visualizado en factura
-- Promo/descuento informado
-- Canal por el que recibió la oferta
-- Derivación al asesor
+Cliente dentro de primeros 60 días. Caso: inconsistencia entre oferta comercial y primera factura.
 
 ### Soporte
-- DNI/CUIT
-- Tipo de servicio
-- Menú real del bot
-- Inconveniente técnico
-- Domicilio / línea afectada
-- Fecha de inicio
-- Pruebas realizadas
-- Derivación al asesor
-
-Reclamos recientes, visitas recientes y estado técnico quedan como consulta CRM/herramienta interna.
+Inconveniente técnico con afectación del servicio. Reclamos y visitas recientes se consultan en CRM, no se preguntan al cliente.
 
 ### Retención
-- DNI/CUIT
-- Tipo de servicio
-- Menú real del bot
-- Baja
-- Motivo de solicitud
-- Derivación al asesor
+Solicitud de baja/disconformidad/migración. Captura motivo declarado.
 
 ## Uso
 
-Abrir `index.html` en navegador o subir los archivos al repo de GitHub Pages reemplazando los existentes.
+Abrir `index.html` o subir los archivos al repo de GitHub Pages.

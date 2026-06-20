@@ -1,515 +1,327 @@
-const MODULES = {
+const modules = {
+  ventas: { label: "Ventas", colorClass: "card-sales", icon: "▣", title: "Ventas | Consulta comercial", badge: "Contexto mínimo" },
+  onboarding: { label: "Onboarding", colorClass: "card-onboarding", icon: "◆", title: "Onboarding | Potencial detractor", badge: "Contexto listo" },
+  soporte: { label: "Soporte", colorClass: "card-support", icon: "☎", title: "Soporte | Continuidad del servicio", badge: "Contexto listo" },
+  retencion: { label: "Retención", colorClass: "card-retention", icon: "⟳", title: "Retención | Riesgo de fuga", badge: "Contexto listo" }
+};
+
+const flows = {
   ventas: {
-    name: "Ventas",
-    icon: "▣",
-    theme: "ventas",
-    badge: "Consulta",
     start: "ventas_dni",
-    title: "Ventas | Consulta comercial",
-    caseName: "Contratación o modificación de producto/servicio",
-    suggestion: "Retomar la gestión desde el producto o servicio solicitado. Explorar necesidad del cliente, disponibilidad, condiciones de contratación y promociones vigentes antes de confirmar la oferta comercial."
+    nodes: {
+      ventas_dni: { bot: "¡Hola! Soy el asistente virtual de Personal 😎\n\nPara ayudarte con una consulta comercial, escribime el DNI o CUIT asociado.", inputKey: "dniCuit", next: "ventas_producto" },
+      ventas_producto: { bot: "¿Qué servicio o producto querés consultar?", options: [
+        ["Internet / TV", "ventas_fin"], ["Línea móvil", "ventas_fin"], ["Combo / Conexión Total", "ventas_fin"], ["Portabilidad", "ventas_fin"], ["Equipo contra factura", "ventas_fin"], ["Línea adicional", "ventas_fin"], ["Reposición de SIM / recuperar línea", "ventas_fin"], ["Otro producto / servicio", "ventas_fin"]
+      ], storeKey: "productoSolicitado" },
+      ventas_fin: { bot: "Perfecto. Te paso con un asesor comercial para continuar con la gestión.", advisor: true }
+    }
   },
   onboarding: {
-    name: "Onboarding",
-    icon: "◆",
-    theme: "onboarding",
-    badge: "Atención",
-    start: "onboarding_dni",
-    title: "Onboarding | Potencial detractor",
-    caseName: "Inconsistencia entre oferta comercial y primera factura",
-    suggestion: "Retomar la gestión desde la inconsistencia comercial declarada por el cliente. Validar en CRM la oferta registrada, revisar primera factura, bonificaciones aplicadas y criterio BC. Si corresponde, gestionar ajuste/NC; si no corresponde, informar criterio y evaluar alternativa comercial o escalamiento."
+    start: "ob_dni",
+    nodes: {
+      ob_dni: { bot: "Detectamos que tu servicio fue adquirido recientemente.\n\nPara revisar la primera factura, escribime el DNI o CUIT asociado.", inputKey: "dniCuit", next: "ob_servicio" },
+      ob_servicio: { bot: "¿Qué tipo de servicio tenés?", options: [["Internet / TV", "ob_domicilio"], ["Telefonía fija", "ob_domicilio"], ["Línea móvil", "ob_linea"]], storeKey: "servicio" },
+      ob_domicilio: { bot: "¿Cuál es el domicilio donde tenés instalado el servicio?", inputKey: "domicilio", next: "ob_submotivo" },
+      ob_linea: { bot: "¿Cuál es el número de línea móvil?", inputKey: "linea", next: "ob_submotivo" },
+      ob_submotivo: { bot: "¿Qué situación querés revisar sobre la primera factura?", options: [["Precio/promoción no coincidente", "ob_importe_venta"], ["Proporcional no comprendido", "ob_importe_venta"], ["Bonificación/descuento no visualizado", "ob_importe_venta"]], storeKey: "submotivo" },
+      ob_importe_venta: { bot: "¿Qué importe te informaron al momento de la venta?", inputKey: "importeVenta", next: "ob_importe_factura" },
+      ob_importe_factura: { bot: "¿Qué importe visualizás actualmente en la factura?", inputKey: "importeFactura", next: "ob_promo" },
+      ob_promo: { bot: "¿Qué promo o descuento te habían informado?", inputKey: "promo", next: "ob_canal" },
+      ob_canal: { bot: "¿A través de qué canal te realizaron la oferta?", options: [["Llamada", "ob_fin"], ["WhatsApp", "ob_fin"], ["Mail", "ob_fin"], ["Presencial / local", "ob_fin"], ["Web / app", "ob_fin"], ["No recuerdo", "ob_fin"]], storeKey: "canalOferta" },
+      ob_fin: { bot: "Gracias. Con esta información te paso con un asesor para revisar CRM, factura y condiciones comerciales.", advisor: true }
+    }
   },
   soporte: {
-    name: "Soporte",
-    icon: "☏",
-    theme: "soporte",
-    badge: "Contexto",
     start: "soporte_dni",
-    title: "Soporte | Cliente reincidente / potencial detractor",
-    caseName: "Inconveniente técnico con afectación del servicio",
-    suggestion: "Retomar la gestión desde el inconveniente técnico declarado. Revisar historial de reclamos, pruebas ya realizadas, visitas previas y estado técnico del servicio antes de indicar nuevas pruebas. Si existen reclamos recientes o visitas incumplidas en CRM, priorizar continuidad de gestión y evitar reiniciar el diagnóstico desde cero."
+    nodes: {
+      soporte_dni: { bot: "Para ayudarte con soporte técnico, escribime el DNI o CUIT asociado al servicio.", inputKey: "dniCuit", next: "soporte_servicio" },
+      soporte_servicio: { bot: "¿Qué tipo de servicio tenés?", options: [["Internet / TV", "soporte_menu"], ["Telefonía fija", "soporte_menu"], ["Línea móvil", "soporte_menu"]], storeKey: "servicio" },
+      soporte_menu: { bot: "¿Por dónde viene tu consulta?", options: [["Facturación", "soporte_no_scope"], ["Pagos", "soporte_no_scope"], ["Trámites", "soporte_no_scope"], ["Soporte técnico", "soporte_inconveniente"], ["Ventas", "soporte_no_scope"], ["Baja", "soporte_no_scope"]] },
+      soporte_no_scope: { bot: "Para esta simulación vamos a continuar por Soporte técnico.", next: "soporte_inconveniente", auto: true },
+      soporte_inconveniente: { bot: "¿Qué inconveniente técnico tenés?", options: [["Sin servicio", "soporte_contacto"], ["Servicio intermitente / microcortes", "soporte_contacto"], ["Lentitud", "soporte_contacto"], ["Problema con TV / Flow", "soporte_contacto"], ["Telefonía fija sin funcionamiento", "soporte_contacto"], ["Visita técnica incumplida", "soporte_contacto"], ["Ya reclamé y sigue igual", "soporte_contacto"], ["No puedo avanzar por bot/app", "soporte_contacto"]], storeKey: "inconveniente" },
+      soporte_contacto: { bot: "Indicame el domicilio del servicio o la línea afectada.", inputKey: "domicilioLinea", next: "soporte_fecha" },
+      soporte_fecha: { bot: "¿Desde cuándo ocurre el inconveniente?", inputKey: "fechaInicio", next: "soporte_pruebas" },
+      soporte_pruebas: { bot: "¿Qué pruebas ya realizaste?", options: [["Reinicié el módem", "soporte_fin"], ["Revisé cables/conexiones", "soporte_fin"], ["Probé con otro dispositivo", "soporte_fin"], ["Ya hice pruebas con el bot/app", "soporte_fin"], ["No realicé pruebas", "soporte_fin"], ["Otra", "soporte_fin"]], storeKey: "pruebas" },
+      soporte_fin: { bot: "Gracias. Te paso con soporte técnico con el contexto capturado para evitar reiniciar el diagnóstico desde cero.", advisor: true }
+    }
   },
   retencion: {
-    name: "Retención",
-    icon: "⟳",
-    theme: "retencion",
-    badge: "Riesgo de fuga",
-    start: "retencion_dni",
-    title: "Retención | Riesgo de fuga",
-    caseName: "Intención de baja, disconformidad o migración",
-    suggestion: "Retomar la gestión desde el motivo declarado por el cliente. Revisar servicios activos, descuentos vigentes, historial de reclamos, aumentos recientes y alternativas comerciales disponibles antes de ofrecer una propuesta de retención. Evitar responder solo con descuento si el motivo principal es técnico, administrativo o una gestión previa no resuelta."
+    start: "ret_dni",
+    nodes: {
+      ret_dni: { bot: "Para continuar con tu solicitud, escribime el DNI o CUIT asociado al servicio.", inputKey: "dniCuit", next: "ret_servicio" },
+      ret_servicio: { bot: "¿Qué tipo de servicio tenés?", options: [["Internet / TV", "ret_menu"], ["Telefonía fija", "ret_menu"], ["Línea móvil", "ret_menu"]], storeKey: "servicio" },
+      ret_menu: { bot: "¿Por dónde viene tu consulta?", options: [["Facturación", "ret_no_scope"], ["Pagos", "ret_no_scope"], ["Trámites", "ret_no_scope"], ["Soporte técnico", "ret_no_scope"], ["Ventas", "ret_no_scope"], ["Baja", "ret_motivo"]] },
+      ret_no_scope: { bot: "Para esta simulación vamos a continuar por Baja / Retención.", next: "ret_motivo", auto: true },
+      ret_motivo: { bot: "Entiendo. Puedo ayudarte con eso.\n¿Cuál es el motivo de tu solicitud?", options: [["Aumento del servicio / precio", "ret_fin"], ["Oferta de otra compañía", "ret_fin"], ["Falla técnica no resuelta", "ret_fin"], ["No uso el servicio", "ret_fin"], ["Quiero bajar el costo / reducir servicios", "ret_fin"], ["Gestión previa no resuelta", "ret_fin"], ["Mudanza", "ret_fin"], ["Otro motivo", "ret_fin"]], storeKey: "motivo" },
+      ret_fin: { bot: "Gracias. Te paso con un asesor para revisar el motivo declarado y las alternativas disponibles.", advisor: true }
+    }
   }
 };
 
-const FLOW = {
-  ventas_dni: {
-    bot: "¡Hola! Soy Pía, tu línea directa con Personal 😎\n\nPara empezar, escribime el DNI o CUIT asociado al servicio, sin puntos ni guiones. ✍️",
-    input: "dniCuit",
-    next: "ventas_producto"
-  },
-  ventas_producto: {
-    bot: "¿Qué servicio o producto querés contratar o modificar?",
-    options: [
-      ["Internet / TV", "ventas_advisor", "productoSolicitado"],
-      ["Línea móvil", "ventas_advisor", "productoSolicitado"],
-      ["Combo / Conexión Total", "ventas_advisor", "productoSolicitado"],
-      ["Portabilidad", "ventas_advisor", "productoSolicitado"],
-      ["Equipo contra factura", "ventas_advisor", "productoSolicitado"],
-      ["Línea adicional", "ventas_advisor", "productoSolicitado"],
-      ["Reposición de SIM / recuperar línea", "ventas_advisor", "productoSolicitado"],
-      ["Otro producto / servicio", "ventas_advisor", "productoSolicitado"]
-    ]
-  },
-  ventas_advisor: {
-    bot: "Perfecto. Te paso con un asesor comercial para continuar la gestión.",
-    advisor: true
-  },
-
-  onboarding_dni: {
-    bot: "¡Hola! Soy Pía, tu línea directa con Personal 😎\n\nDetectamos que tu servicio fue adquirido recientemente. Para empezar, escribime el DNI o CUIT asociado, sin puntos ni guiones. ✍️",
-    input: "dniCuit",
-    next: "onboarding_service"
-  },
-  onboarding_service: {
-    bot: "¿Qué tipo de servicio tenés?",
-    options: [
-      ["Internet / TV", "onboarding_address", "serviceType"],
-      ["Telefonía fija", "onboarding_address", "serviceType"],
-      ["Línea móvil", "onboarding_line", "serviceType"]
-    ]
-  },
-  onboarding_address: {
-    bot: "¿Cuál es el domicilio donde tenés instalado el servicio?",
-    input: "addressOrLine",
-    next: "onboarding_issue"
-  },
-  onboarding_line: {
-    bot: "¿Cuál es el número de línea afectada?",
-    input: "addressOrLine",
-    next: "onboarding_issue"
-  },
-  onboarding_issue: {
-    bot: "Para ayudarte con la primera factura, indicame cuál de estas situaciones querés revisar:",
-    options: [
-      ["Precio/promoción no coincidente", "onboarding_sale_amount", "submotivo"],
-      ["Proporcional no comprendido", "onboarding_sale_amount", "submotivo"],
-      ["Bonificación/descuento no visualizado", "onboarding_sale_amount", "submotivo"]
-    ]
-  },
-  onboarding_sale_amount: {
-    bot: "¿Qué importe te informaron al momento de la venta?",
-    input: "importeVenta",
-    next: "onboarding_invoice_amount"
-  },
-  onboarding_invoice_amount: {
-    bot: "¿Qué importe visualizás actualmente en la factura?",
-    input: "importeFactura",
-    next: "onboarding_discount"
-  },
-  onboarding_discount: {
-    bot: "¿Qué promo, bonificación o descuento te habían informado?",
-    input: "promoDescuento",
-    next: "onboarding_channel"
-  },
-  onboarding_channel: {
-    bot: "¿A través de qué canal te realizaron la oferta?",
-    options: [
-      ["Llamada", "onboarding_advisor", "canalOferta"],
-      ["WhatsApp", "onboarding_advisor", "canalOferta"],
-      ["Mail", "onboarding_advisor", "canalOferta"],
-      ["Presencial / local", "onboarding_advisor", "canalOferta"],
-      ["Web / app", "onboarding_advisor", "canalOferta"],
-      ["No recuerdo", "onboarding_advisor", "canalOferta"]
-    ]
-  },
-  onboarding_advisor: {
-    bot: "Gracias. Con esa información te paso con un asesor para revisar la inconsistencia entre la oferta comercial y la primera factura.",
-    advisor: true
-  },
-
-  soporte_dni: {
-    bot: "¡Hola! Soy Pía, tu línea directa con Personal 😎\n\nPara empezar, escribime el DNI o CUIT asociado al servicio, sin puntos ni guiones. ✍️",
-    input: "dniCuit",
-    next: "soporte_service"
-  },
-  soporte_service: {
-    bot: "¿Qué tipo de servicio tenés?",
-    options: [
-      ["Internet / TV", "soporte_menu", "serviceType"],
-      ["Telefonía fija", "soporte_menu", "serviceType"],
-      ["Línea móvil", "soporte_menu", "serviceType"]
-    ]
-  },
-  soporte_menu: {
-    bot: "¿Por dónde viene tu consulta?",
-    options: [
-      ["Facturación", "soporte_not_supported", "menuReal"],
-      ["Pagos", "soporte_not_supported", "menuReal"],
-      ["Trámites", "soporte_not_supported", "menuReal"],
-      ["Soporte técnico", "soporte_issue", "menuReal"],
-      ["Ventas", "soporte_not_supported", "menuReal"],
-      ["Baja", "soporte_not_supported", "menuReal"]
-    ]
-  },
-  soporte_not_supported: {
-    bot: "Para esta demo vamos a recorrer el flujo de Soporte técnico. Elegí esa opción para continuar.",
-    next: "soporte_menu"
-  },
-  soporte_issue: {
-    bot: "¿Qué inconveniente técnico tenés?",
-    options: [
-      ["Sin servicio", "soporte_location", "inconveniente"],
-      ["Servicio intermitente / microcortes", "soporte_location", "inconveniente"],
-      ["Lentitud", "soporte_location", "inconveniente"],
-      ["Problema con TV / Flow", "soporte_location", "inconveniente"],
-      ["Telefonía fija sin funcionamiento", "soporte_location", "inconveniente"],
-      ["Visita técnica incumplida", "soporte_location", "inconveniente"],
-      ["Ya reclamé y sigue igual", "soporte_location", "inconveniente"],
-      ["No puedo avanzar por bot/app", "soporte_location", "inconveniente"]
-    ]
-  },
-  soporte_location: {
-    bot: "Indicame el domicilio del servicio o la línea afectada, según corresponda.",
-    input: "addressOrLine",
-    next: "soporte_start_date"
-  },
-  soporte_start_date: {
-    bot: "¿Desde cuándo ocurre el inconveniente?",
-    input: "fechaInicio",
-    next: "soporte_tests"
-  },
-  soporte_tests: {
-    bot: "¿Qué pruebas ya realizaste?",
-    options: [
-      ["Reinicié el módem", "soporte_advisor", "pruebas"],
-      ["Revisé cables/conexiones", "soporte_advisor", "pruebas"],
-      ["Probé con otro dispositivo", "soporte_advisor", "pruebas"],
-      ["Ya hice pruebas con el bot/app", "soporte_advisor", "pruebas"],
-      ["No realicé pruebas", "soporte_advisor", "pruebas"],
-      ["Otra", "soporte_advisor", "pruebas"]
-    ]
-  },
-  soporte_advisor: {
-    bot: "Gracias. Te paso con soporte técnico con el contexto del recorrido para evitar reiniciar el diagnóstico desde cero.",
-    advisor: true
-  },
-
-  retencion_dni: {
-    bot: "¡Hola! Soy Pía, tu línea directa con Personal 😎\n\nPara empezar, escribime el DNI o CUIT asociado al servicio, sin puntos ni guiones. ✍️",
-    input: "dniCuit",
-    next: "retencion_service"
-  },
-  retencion_service: {
-    bot: "¿Qué tipo de servicio tenés?",
-    options: [
-      ["Internet / TV", "retencion_menu", "serviceType"],
-      ["Telefonía fija", "retencion_menu", "serviceType"],
-      ["Línea móvil", "retencion_menu", "serviceType"]
-    ]
-  },
-  retencion_menu: {
-    bot: "¿Por dónde viene tu consulta?",
-    options: [
-      ["Facturación", "retencion_not_supported", "menuReal"],
-      ["Pagos", "retencion_not_supported", "menuReal"],
-      ["Trámites", "retencion_not_supported", "menuReal"],
-      ["Soporte técnico", "retencion_not_supported", "menuReal"],
-      ["Ventas", "retencion_not_supported", "menuReal"],
-      ["Baja", "retencion_reason", "menuReal"]
-    ]
-  },
-  retencion_not_supported: {
-    bot: "Para esta demo vamos a recorrer el flujo de Baja / Retención. Elegí Baja para continuar.",
-    next: "retencion_menu"
-  },
-  retencion_reason: {
-    bot: "¿Cuál es el motivo de tu solicitud?",
-    options: [
-      ["Aumento del servicio / precio", "retencion_advisor", "motivoDeclarado"],
-      ["Oferta de otra compañía", "retencion_advisor", "motivoDeclarado"],
-      ["Falla técnica no resuelta", "retencion_advisor", "motivoDeclarado"],
-      ["No uso el servicio", "retencion_advisor", "motivoDeclarado"],
-      ["Quiero bajar el costo / reducir servicios", "retencion_advisor", "motivoDeclarado"],
-      ["Gestión previa no resuelta", "retencion_advisor", "motivoDeclarado"],
-      ["Mudanza", "retencion_advisor", "motivoDeclarado"],
-      ["Otro motivo", "retencion_advisor", "motivoDeclarado"]
-    ]
-  },
-  retencion_advisor: {
-    bot: "Entiendo. Te paso con un asesor para revisar tu solicitud y las alternativas disponibles.",
-    advisor: true
-  }
-};
-
-let agentName = "";
-let activeModule = "ventas";
-let currentNode = null;
-let events = [];
-let data = {};
-let caseId = "DEMO-" + new Date().toISOString().slice(0,19).replace(/[-:T]/g, "");
-
+const app = document.getElementById("app");
 const loginScreen = document.getElementById("loginScreen");
-const appShell = document.getElementById("appShell");
 const loginForm = document.getElementById("loginForm");
-const agentNameInput = document.getElementById("agentName");
-const displayName = document.getElementById("displayName");
-const displayNameRight = document.getElementById("displayNameRight");
+const advisorNameInput = document.getElementById("advisorNameInput");
+const advisorGreeting = document.getElementById("advisorGreeting");
+const advisorProfileName = document.getElementById("advisorProfileName");
 const chat = document.getElementById("chat");
 const options = document.getElementById("options");
 const textForm = document.getElementById("textForm");
 const textInput = document.getElementById("textInput");
 const advisorCard = document.getElementById("advisorCard");
-const suggestionCard = document.getElementById("suggestionCard");
-const suggestionText = document.getElementById("suggestionText");
-const contextStatus = document.getElementById("contextStatus");
-const restartBtn = document.getElementById("restartBtn");
-const csvBtn = document.getElementById("csvBtn");
+const actionBox = document.getElementById("actionBox");
+const actionSuggestion = document.getElementById("actionSuggestion");
+const contextBadge = document.getElementById("contextBadge");
+const modal = document.getElementById("modal");
+const modalTitle = document.getElementById("modalTitle");
+const modalContent = document.getElementById("modalContent");
+
+let advisorName = "Nicolás";
+let currentModule = null;
+let currentNode = null;
+let data = {};
+let events = [];
+let conversations = [];
+let currentCaseId = "";
 
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const name = agentNameInput.value.trim() || "Asesor";
-  agentName = name;
-  displayName.textContent = firstName(name);
-  displayNameRight.textContent = name;
-  loginScreen.classList.add("is-hidden");
-  appShell.classList.remove("is-hidden");
-  startModule("ventas");
+  advisorName = advisorNameInput.value.trim() || "Nicolás";
+  advisorGreeting.textContent = advisorName;
+  advisorProfileName.textContent = advisorName;
+  loginScreen.classList.add("hidden");
+  app.classList.remove("hidden");
+  resetWorkspace();
 });
 
-document.querySelectorAll(".module-card").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const module = btn.dataset.module;
-    if (!MODULES[module]) {
-      showPending(module);
-      return;
-    }
-    startModule(module);
-  });
-});
-
-restartBtn.addEventListener("click", () => startModule(activeModule));
-csvBtn.addEventListener("click", downloadCSV);
+document.querySelectorAll(".module-card").forEach(btn => btn.addEventListener("click", () => startModule(btn.dataset.module)));
+document.querySelectorAll(".nav-item").forEach(btn => btn.addEventListener("click", () => handleNav(btn.dataset.view, btn)));
+document.getElementById("newSimulationBtn").addEventListener("click", resetWorkspace);
+document.getElementById("diagnosticBtn").addEventListener("click", showDiagnostic);
+document.getElementById("csvBtn").addEventListener("click", downloadCSV);
+document.getElementById("filtersBtn").addEventListener("click", showFilters);
+document.getElementById("crmBtn").addEventListener("click", showCRM);
+document.getElementById("takeContactBtn").addEventListener("click", takeContact);
+document.getElementById("modalClose").addEventListener("click", closeModal);
+modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 
 textForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const value = textInput.value.trim();
-  if (!value || !currentNode) return;
-  addClientMessage(value, "texto");
+  if (!value || !currentModule || !currentNode) return;
+  addMessage(value, "client");
+  events.push({ actor: "cliente", type: "texto", content: value, timestamp: new Date().toISOString() });
+  const node = flows[currentModule].nodes[currentNode];
+  if (node.inputKey) data[node.inputKey] = value;
   textInput.value = "";
-  const node = FLOW[currentNode];
-  if (node?.input) {
-    data[node.input] = value;
-    setTimeout(() => goToNode(node.next), 320);
-  }
+  goTo(node.next);
 });
 
-function startModule(module) {
-  activeModule = module;
-  data = { module: MODULES[module].name };
+function resetWorkspace() {
+  currentModule = null;
+  currentNode = null;
+  data = {};
   events = [];
-  caseId = "DEMO-" + new Date().toISOString().slice(0,19).replace(/[-:T]/g, "");
-  chat.innerHTML = "";
+  currentCaseId = "CX-" + new Date().toISOString().slice(0,19).replace(/[-:T]/g, "");
+  document.querySelectorAll(".module-card").forEach(b => b.classList.remove("active"));
+  chat.innerHTML = `<div class="day-pill">Hoy</div>`;
+  addMessage("Seleccioná un módulo CX para iniciar la simulación.", "bot", false);
   options.innerHTML = "";
-  suggestionCard.classList.add("is-hidden");
-  contextStatus.textContent = "En espera";
-  contextStatus.classList.add("waiting");
-  setActiveModule(module);
-  renderEmptyAdvisor(module);
-  goToNode(MODULES[module].start);
+  renderEmptyCard();
 }
 
-function setActiveModule(module) {
-  document.querySelectorAll(".module-card").forEach(btn => btn.classList.toggle("active", btn.dataset.module === module));
+function startModule(moduleKey) {
+  currentModule = moduleKey;
+  currentNode = flows[moduleKey].start;
+  data = { modulo: modules[moduleKey].label };
+  events = [];
+  currentCaseId = "CX-" + new Date().toISOString().slice(0,19).replace(/[-:T]/g, "");
+  document.querySelectorAll(".module-card").forEach(b => b.classList.toggle("active", b.dataset.module === moduleKey));
+  chat.innerHTML = `<div class="day-pill">Hoy</div>`;
+  renderWaitingCard(moduleKey);
+  runNode();
 }
 
-function showPending(module) {
-  setActiveModule(module);
-  chat.innerHTML = "";
-  options.innerHTML = "";
-  const label = module === "prepago" ? "Prepago" : "Overnight";
-  advisorCard.className = "advisor-card empty-state";
-  advisorCard.innerHTML = `<h3>${label} | Pendiente</h3><p>Este módulo queda visible para la presentación, pero todavía no tiene flujo cargado.</p>`;
-  suggestionCard.classList.add("is-hidden");
-  contextStatus.textContent = "Pendiente";
-  contextStatus.classList.add("waiting");
-  addBotMessage(`Módulo ${label} pendiente de definición. Cuando tengamos insumos, cargamos el recorrido conversacional.`);
-}
-
-function goToNode(nodeId) {
-  const node = FLOW[nodeId];
+function runNode() {
+  const node = flows[currentModule].nodes[currentNode];
   if (!node) return;
-  currentNode = nodeId;
-  addBotMessage(node.bot);
-  renderOptions(node.options || []);
-  if (node.next && !node.input && !node.options && !node.advisor) {
-    setTimeout(() => goToNode(node.next), 650);
-  }
+  if (node.auto) { setTimeout(() => goTo(node.next), 550); return; }
+  addMessage(node.bot, "bot");
+  events.push({ actor: "bot", type: "mensaje_bot", content: node.bot, timestamp: new Date().toISOString() });
+  options.innerHTML = "";
+  if (node.options) renderOptions(node.options, node.storeKey);
   if (node.advisor) {
     setTimeout(() => {
-      addAdvisorMessage("Hola, soy un asesor. Ya veo el contexto que recopiló Pía.");
+      addMessage("Hola, soy un asesor. Ya veo el recorrido que hiciste con Pía.", "advisor");
       renderAdvisorCard();
-    }, 550);
+      saveConversation();
+    }, 650);
   }
 }
 
-function renderOptions(optionList) {
+function goTo(nodeId) { currentNode = nodeId; setTimeout(runNode, 360); }
+
+function renderOptions(list, storeKey) {
   options.innerHTML = "";
-  optionList.forEach(([label, next, field]) => {
+  list.forEach(([label, next]) => {
     const btn = document.createElement("button");
-    btn.type = "button";
     btn.className = "option-button";
+    btn.type = "button";
     btn.textContent = label;
     btn.addEventListener("click", () => {
-      addClientMessage(label, "boton");
-      if (field) data[field] = label;
-      setTimeout(() => goToNode(next), 300);
+      addMessage(label, "client");
+      events.push({ actor: "cliente", type: "boton", content: label, timestamp: new Date().toISOString() });
+      if (storeKey) data[storeKey] = label;
+      options.innerHTML = "";
+      goTo(next);
     });
     options.appendChild(btn);
   });
 }
 
-function addBotMessage(content) { addMessage(content, "bot"); addEvent("bot", content); }
-function addClientMessage(content, type) { addMessage(content, "client"); addEvent("cliente", content, type); }
-function addAdvisorMessage(content) { addMessage(content, "advisor"); addEvent("asesor", content); }
-
-function addMessage(content, actor) {
+function addMessage(text, actor, store = true) {
   const div = document.createElement("div");
   div.className = `message ${actor}`;
-  div.innerHTML = `${escapeHtml(content)}<span class="time">${currentTime()}</span>`;
+  div.innerHTML = `${escapeHtml(text)}<span class="time">${new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}</span>`;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 }
 
-function addEvent(actor, content, type = "mensaje") {
-  events.push({ timestamp: new Date().toISOString(), actor, type, content });
+function renderEmptyCard() {
+  contextBadge.textContent = "En espera";
+  contextBadge.className = "context-badge waiting";
+  advisorCard.className = "advisor-card empty-card";
+  advisorCard.innerHTML = `<div><h3>Seleccioná un módulo para iniciar</h3><p>La card se completará con el contexto capturado durante el recorrido.</p></div>`;
+  actionBox.classList.add("hidden");
 }
 
-function renderEmptyAdvisor(module) {
-  const m = MODULES[module];
-  advisorCard.className = "advisor-card empty-state";
-  advisorCard.innerHTML = `<h3>${m.title}</h3><p>La card se completará cuando el bot capture la información clave del recorrido.</p>`;
+function renderWaitingCard(moduleKey) {
+  const mod = modules[moduleKey];
+  contextBadge.textContent = "En espera";
+  contextBadge.className = "context-badge waiting";
+  advisorCard.className = `advisor-card ${mod.colorClass}`;
+  advisorCard.innerHTML = `<div class="card-header"><div class="card-heading"><span class="card-icon">${mod.icon}</span>${mod.title}</div><span class="status-pill">EN CURSO</span></div><div class="card-body"><div class="info-row"><span class="info-icon">◇</span><span class="label">Estado:</span><span class="value">Recopilando contexto</span></div></div>`;
+  actionBox.classList.add("hidden");
 }
 
 function renderAdvisorCard() {
-  const m = MODULES[activeModule];
-  const rows = getAdvisorRows(activeModule);
-  advisorCard.className = `advisor-card card-${m.theme}`;
+  const mod = modules[currentModule];
+  contextBadge.textContent = mod.badge;
+  contextBadge.className = "context-badge";
+  const rows = getRowsForModule(currentModule);
+  advisorCard.className = `advisor-card ${mod.colorClass}`;
   advisorCard.innerHTML = `
-    <div class="card-title">
-      <span class="big-icon">${m.icon}</span>
-      <h3>${m.title}</h3>
-      <span class="badge">${m.badge}</span>
-    </div>
-    <div class="card-body">
-      ${rows.map(row => `
-        <div class="info-row">
-          <span class="row-icon">${row.icon}</span>
-          <span class="label">${escapeHtml(row.label)}</span>
-          <span class="value">${escapeHtml(row.value || "No informado")}</span>
-        </div>
-      `).join("")}
-    </div>
-  `;
-  suggestionText.textContent = m.suggestion;
-  suggestionCard.classList.remove("is-hidden");
-  contextStatus.textContent = "Contexto listo";
-  contextStatus.classList.remove("waiting");
+    <div class="card-header"><div class="card-heading"><span class="card-icon">${mod.icon}</span>${mod.title}</div><span class="status-pill">${mod.badge.toUpperCase()}</span></div>
+    <div class="card-body">${rows.map(r => `<div class="info-row"><span class="info-icon">${r.icon}</span><span class="label">${escapeHtml(r.label)}</span><span class="value">${escapeHtml(r.value || "—")}</span></div>`).join("")}</div>`;
+  actionSuggestion.textContent = getSuggestion(currentModule);
+  actionBox.classList.remove("hidden");
 }
 
-function getAdvisorRows(module) {
-  if (module === "ventas") {
+function getRowsForModule(moduleKey) {
+  if (moduleKey === "ventas") return [
+    { icon: "▣", label: "DNI/CUIT:", value: data.dniCuit },
+    { icon: "⌁", label: "Producto solicitado:", value: data.productoSolicitado },
+    { icon: "▢", label: "Caso:", value: "Contratación o modificación de producto/servicio" }
+  ];
+  if (moduleKey === "onboarding") {
+    const diff = calcDiff(data.importeVenta, data.importeFactura);
     return [
-      { icon: "▦", label: "DNI/CUIT:", value: data.dniCuit },
-      { icon: "◇", label: "Servicio / producto solicitado:", value: data.productoSolicitado },
-      { icon: "▣", label: "Caso:", value: MODULES.ventas.caseName }
+      { icon: "▣", label: "DNI/CUIT:", value: data.dniCuit },
+      { icon: "⌁", label: "Servicio:", value: data.servicio },
+      { icon: "⌂", label: data.linea ? "Línea:" : "Domicilio:", value: data.linea || data.domicilio },
+      { icon: "◇", label: "Caso:", value: "Inconsistencia entre oferta comercial y primera factura" },
+      { icon: "▤", label: "Submotivo:", value: data.submotivo },
+      { icon: "$", label: "Importe informado:", value: data.importeVenta },
+      { icon: "$", label: "Importe facturado:", value: data.importeFactura },
+      { icon: "△", label: "Diferencia declarada:", value: diff },
+      { icon: "◌", label: "Promo/descuento:", value: data.promo },
+      { icon: "↗", label: "Canal de oferta:", value: data.canalOferta }
     ];
   }
-
-  if (module === "onboarding") {
-    return [
-      { icon: "▦", label: "DNI/CUIT:", value: data.dniCuit },
-      { icon: "◌", label: "Servicio:", value: data.serviceType },
-      { icon: "⌂", label: data.serviceType === "Línea móvil" ? "Línea:" : "Domicilio:", value: data.addressOrLine },
-      { icon: "◇", label: "Motivo:", value: "Consulta por conceptos facturados" },
-      { icon: "⚠", label: "Fricción:", value: "Inconsistencia comercial" },
-      { icon: "▣", label: "Caso:", value: MODULES.onboarding.caseName },
-      { icon: "$", label: "Importe informado en venta:", value: data.importeVenta },
-      { icon: "$", label: "Importe visualizado en factura:", value: data.importeFactura },
-      { icon: "↕", label: "Diferencia declarada:", value: calculateDifference(data.importeVenta, data.importeFactura) },
-      { icon: "%", label: "Promo/descuento informado:", value: data.promoDescuento },
-      { icon: "☵", label: "Canal de oferta declarado:", value: data.canalOferta }
-    ];
-  }
-
-  if (module === "soporte") {
-    return [
-      { icon: "▦", label: "DNI/CUIT:", value: data.dniCuit },
-      { icon: "◌", label: "Servicio:", value: data.serviceType },
-      { icon: "⚠", label: "Inconveniente:", value: data.inconveniente },
-      { icon: "⌂", label: "Domicilio / línea:", value: data.addressOrLine },
-      { icon: "◷", label: "Fecha de inicio:", value: data.fechaInicio },
-      { icon: "✓", label: "Pruebas realizadas:", value: data.pruebas },
-      { icon: "↺", label: "Reclamos recientes:", value: "Consultar en CRM" },
-      { icon: "☏", label: "Visitas recientes:", value: "Consultar en CRM" },
-      { icon: "▣", label: "Estado técnico / agenda:", value: "Consultar herramienta interna" }
-    ];
-  }
-
+  if (moduleKey === "soporte") return [
+    { icon: "▣", label: "DNI/CUIT:", value: data.dniCuit },
+    { icon: "⌁", label: "Servicio:", value: data.servicio },
+    { icon: "△", label: "Inconveniente:", value: data.inconveniente },
+    { icon: "⌂", label: "Domicilio / línea:", value: data.domicilioLinea },
+    { icon: "◷", label: "Fecha de inicio:", value: data.fechaInicio },
+    { icon: "✓", label: "Pruebas realizadas:", value: data.pruebas },
+    { icon: "↺", label: "Reclamos recientes:", value: "Consultar en CRM" },
+    { icon: "☎", label: "Visitas recientes:", value: "Consultar en CRM" },
+    { icon: "▥", label: "Estado técnico / agenda:", value: "Consultar en herramienta interna" }
+  ];
   return [
-    { icon: "▦", label: "DNI/CUIT:", value: data.dniCuit },
-    { icon: "◌", label: "Servicio:", value: data.serviceType },
-    { icon: "◇", label: "Motivo declarado:", value: data.motivoDeclarado },
-    { icon: "▣", label: "Caso:", value: MODULES.retencion.caseName },
-    { icon: "⚠", label: "Fricción detectada:", value: "Percepción de costo no sostenible o valor insuficiente" },
-    { icon: "◷", label: "Historial CRM:", value: "Reclamos recientes / descuentos vigentes / fecha último ajuste / gestiones abiertas" }
+    { icon: "▣", label: "DNI/CUIT:", value: data.dniCuit },
+    { icon: "⌁", label: "Servicio:", value: data.servicio },
+    { icon: "◇", label: "Motivo declarado:", value: data.motivo },
+    { icon: "▢", label: "Caso:", value: "Intención de baja, disconformidad o migración" },
+    { icon: "△", label: "Fricción detectada:", value: "Percepción de costo no sostenible o valor insuficiente" },
+    { icon: "↺", label: "Historial CRM:", value: "Reclamos recientes / descuentos vigentes / fecha último ajuste / gestiones abiertas" }
   ];
 }
 
-function calculateDifference(a, b) {
-  const n1 = parseMoney(a);
-  const n2 = parseMoney(b);
-  if (Number.isNaN(n1) || Number.isNaN(n2)) return "Calcular según importes declarados";
-  const diff = Math.abs(n2 - n1);
-  return formatMoney(diff);
-}
-function parseMoney(value) {
-  if (!value) return NaN;
-  const clean = String(value).replace(/\$/g, "").replace(/\./g, "").replace(/,/g, ".").replace(/[^0-9.]/g, "");
-  return Number(clean);
-}
-function formatMoney(num) { return "$" + Math.round(num).toLocaleString("es-AR"); }
-function currentTime() { return new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }); }
-function firstName(name) { return String(name).trim().split(/\s+/)[0] || "Asesor"; }
-function escapeHtml(text) {
-  return String(text ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+function getSuggestion(moduleKey) {
+  if (moduleKey === "ventas") return "Retomar la gestión desde el producto o servicio solicitado. Explorar necesidad del cliente, disponibilidad, condiciones de contratación y promociones vigentes antes de confirmar la oferta comercial.";
+  if (moduleKey === "onboarding") return "Retomar la gestión desde la inconsistencia comercial declarada por el cliente. Validar en CRM la oferta registrada, revisar primera factura, bonificaciones aplicadas y criterio BC. Si corresponde, gestionar ajuste/NC; si no corresponde, informar criterio y evaluar alternativa comercial o escalamiento.";
+  if (moduleKey === "soporte") return "Retomar la gestión desde el inconveniente técnico declarado. Revisar historial de reclamos, pruebas ya realizadas, visitas previas y estado técnico del servicio antes de indicar nuevas pruebas. Priorizar continuidad de gestión y evitar reiniciar el diagnóstico desde cero.";
+  return "Retomar la gestión desde el motivo declarado por el cliente. Revisar servicios activos, descuentos vigentes, historial de reclamos, aumentos recientes y alternativas comerciales disponibles antes de ofrecer una propuesta de retención. Evitar responder solo con descuento si el motivo principal es técnico, administrativo o una gestión previa no resuelta.";
 }
 
-function downloadCSV() {
-  const rows = getAdvisorRows(activeModule);
-  const values = {
-    "ID caso": caseId,
-    "Módulo": MODULES[activeModule]?.name || activeModule,
-    "Eventos": events.length,
-    ...Object.fromEntries(rows.map(r => [r.label.replace(":", ""), r.value || "No informado"])),
-    "Acción sugerida": MODULES[activeModule]?.suggestion || ""
+function showDiagnostic() {
+  const title = currentModule ? `Diagnóstico CX · ${modules[currentModule].label}` : "Diagnóstico CX";
+  const content = currentModule ? diagnosticContent() : `<p>Seleccioná un módulo y completá un recorrido para generar el diagnóstico CX.</p>`;
+  openModal(title, content);
+}
+function diagnosticContent() {
+  const rows = getRowsForModule(currentModule).map(r => `<tr><th>${escapeHtml(r.label)}</th><td>${escapeHtml(r.value || "—")}</td></tr>`).join("");
+  return `<div class="modal-content-card"><h3>Contexto capturado</h3><table class="table-like">${rows}</table></div><div class="modal-content-card"><h3>Acción sugerida</h3><p>${escapeHtml(getSuggestion(currentModule))}</p></div><div class="modal-content-card"><h3>Recorrido</h3><p>${events.filter(e => e.actor === "cliente").map(e => e.content).join(" → ") || "Sin recorrido del cliente registrado todavía."}</p></div>`;
+}
+function handleNav(view, btn) {
+  document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  const map = {
+    inicio: ["Inicio", "Seleccioná un módulo CX para iniciar una simulación o usá Nueva simulación para limpiar el recorrido actual."],
+    conversaciones: ["Conversaciones", conversations.length ? conversations.map(c => `<div class='modal-content-card'><h3>${c.module}</h3><p>${c.path}</p></div>`).join("") : "No hay conversaciones guardadas en esta sesión."],
+    casos: ["Casos", currentModule ? diagnosticContent() : "No hay un caso activo todavía."],
+    alertas: ["Alertas CX", buildAlerts()],
+    reportes: ["Reportes", buildReport()],
+    conocimiento: ["Conocimiento", buildKnowledge()],
+    configuracion: ["Configuración", `<p>Asesor actual: <strong>${escapeHtml(advisorName)}</strong></p><div class='modal-content-card'><p>Para cambiar el nombre, cerrá esta sesión recargando la página o usá Nueva simulación para reiniciar el caso.</p></div>`]
   };
-  const headers = Object.keys(values);
-  const csv = "\uFEFF" + headers.map(csvEscape).join(";") + "\n" + headers.map(h => csvEscape(values[h])).join(";");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${caseId}_contexto_${activeModule}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  openModal(map[view][0], map[view][1]);
 }
-function csvEscape(value) { return `"${String(value ?? "").replaceAll('"', '""')}"`; }
-
-document.getElementById("phoneTime").textContent = currentTime();
+function buildAlerts() {
+  if (!currentModule) return "No hay alertas CX activas. Completá un recorrido para ver señales.";
+  if (currentModule === "ventas") return "Ventas no infiere riesgo ni fricción durante la captura inicial. Solo se deriva intención comercial.";
+  if (currentModule === "onboarding") return "Señal CX: inconsistencia comercial en primeros 60 días. Revisar oferta registrada, factura y criterio BC.";
+  if (currentModule === "soporte") return "Señal CX: posible repetición de diagnóstico. Evitar solicitar pruebas sin revisar historial CRM.";
+  return "Señal CX: riesgo de fuga. La propuesta debe responder al motivo real de salida, no solo al precio.";
+}
+function buildReport() {
+  return `<table class="table-like"><tr><th>ID caso</th><td>${currentCaseId}</td></tr><tr><th>Módulo</th><td>${currentModule ? modules[currentModule].label : "Sin módulo"}</td></tr><tr><th>Mensajes bot</th><td>${events.filter(e => e.actor === "bot").length}</td></tr><tr><th>Interacciones cliente</th><td>${events.filter(e => e.actor === "cliente").length}</td></tr><tr><th>Derivado a asesor</th><td>${events.some(e => e.actor === "asesor") ? "Sí" : "No"}</td></tr></table>`;
+}
+function buildKnowledge() {
+  return `<div class='modal-content-card'><h3>Ventas</h3><p>Captura mínima para consulta comercial: DNI/CUIT y producto solicitado.</p></div><div class='modal-content-card'><h3>Onboarding</h3><p>Primeros 60 días. Inconsistencia entre oferta comercial y primera factura.</p></div><div class='modal-content-card'><h3>Soporte</h3><p>Inconveniente técnico con afectación del servicio. Se consulta CRM para reclamos y visitas.</p></div><div class='modal-content-card'><h3>Retención</h3><p>Intención de baja, disconformidad o migración. Se captura motivo declarado.</p></div>`;
+}
+function showFilters() { openModal("Filtros", "<p>Filtro disponible en esta demo: seleccioná un módulo CX desde la barra lateral para cambiar el recorrido activo.</p>"); }
+function showCRM() { openModal("CRM simulado", currentModule ? `<table class='table-like'><tr><th>DNI/CUIT</th><td>${escapeHtml(data.dniCuit || "—")}</td></tr><tr><th>Servicio</th><td>${escapeHtml(data.servicio || data.productoSolicitado || "—")}</td></tr><tr><th>Reclamos recientes</th><td>Consultar sistema productivo</td></tr><tr><th>Última gestión</th><td>Dato no disponible en demo</td></tr></table>` : "No hay caso activo."); }
+function takeContact() { if (!currentModule) return openModal("Tomar contacto", "Seleccioná un módulo antes de tomar contacto."); addMessage("Asesor conectado. Retomo la gestión con el contexto del recorrido.", "advisor"); openModal("Tomar contacto", "Estado actualizado: asesor conectado al caso."); }
+function saveConversation() { const path = events.filter(e => e.actor === "cliente").map(e => e.content).join(" → "); conversations.unshift({ module: modules[currentModule].label, path: path || "Sin interacciones" }); conversations = conversations.slice(0, 5); }
+function downloadCSV() {
+  const rows = getRowsForModule(currentModule || "ventas");
+  const csv = "\uFEFFCampo;Valor\n" + rows.map(r => `"${r.label.replaceAll('"','""')}";"${String(r.value || "").replaceAll('"','""')}"`).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `${currentCaseId}_contexto_cx.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+function openModal(title, content) { modalTitle.textContent = title; modalContent.innerHTML = typeof content === "string" ? content : String(content); modal.classList.remove("hidden"); }
+function closeModal() { modal.classList.add("hidden"); }
+function calcDiff(a, b) {
+  const x = parseMoney(a), y = parseMoney(b);
+  if (Number.isFinite(x) && Number.isFinite(y)) return formatMoney(y - x);
+  return "Verificar importes declarados";
+}
+function parseMoney(v) { const n = Number(String(v || "").replace(/[^0-9,-]/g, "").replace(",", ".")); return Number.isFinite(n) ? n : NaN; }
+function formatMoney(n) { return `${n < 0 ? "-" : ""}$${Math.abs(n).toLocaleString("es-AR")}`; }
+function escapeHtml(text) { return String(text ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;"); }

@@ -4,94 +4,75 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Personal CX Lab</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <section id="loginScreen" class="login-screen">
     <div class="login-card">
-      <div class="login-brand">
-        <span class="brand-personal">personal</span>
-        <span class="brand-lab">CX Lab</span>
+      <div class="brand-login">
+        <span class="brand-main">personal</span>
+        <span class="brand-sub">CX Lab</span>
       </div>
-      <h1>Accedé al simulador</h1>
-      <p>Ingresá tu nombre para personalizar la experiencia del demo.</p>
+      <h1>Ingresar al simulador CX</h1>
+      <p>Cargá tu nombre para personalizar la sesión y comenzar a simular recorridos conversacionales.</p>
       <form id="loginForm" class="login-form">
-        <label for="agentName">Nombre</label>
-        <input id="agentName" name="agentName" type="text" placeholder="Ej: Nicolás" autocomplete="name" />
+        <label for="advisorNameInput">Nombre</label>
+        <input id="advisorNameInput" type="text" placeholder="Ej: Nicolás" autocomplete="off" />
         <button type="submit">Ingresar al simulador</button>
       </form>
       <small>Demo conceptual. No usa datos reales ni se conecta a sistemas productivos.</small>
     </div>
   </section>
 
-  <main id="appShell" class="app-shell is-hidden">
+  <main id="app" class="app hidden" aria-label="Personal CX Lab">
     <aside class="sidebar">
-      <div class="brand-block">
-        <span class="brand-personal">personal</span>
-        <span class="brand-lab">CX Lab</span>
+      <div class="brand">
+        <span class="brand-main">personal</span>
+        <span class="brand-sub">CX Lab</span>
       </div>
 
-      <nav class="main-nav" aria-label="Navegación principal">
-        <button class="nav-item active" type="button"><span>⌂</span>Inicio</button>
-        <button class="nav-item" type="button"><span>☵</span>Conversaciones</button>
-        <button class="nav-item" type="button"><span>▣</span>Casos</button>
-        <button class="nav-item" type="button"><span>♢</span>Alertas Forenses <b>3</b></button>
-        <button class="nav-item" type="button"><span>▥</span>Reportes</button>
-        <button class="nav-item" type="button"><span>◇</span>Conocimiento</button>
-        <button class="nav-item" type="button"><span>⚙</span>Configuración</button>
+      <nav class="side-nav" aria-label="Navegación principal">
+        <button class="nav-item active" data-view="inicio"><span class="nav-icon">⌂</span><span>Inicio</span></button>
+        <button class="nav-item" data-view="conversaciones"><span class="nav-icon">☰</span><span>Conversaciones</span></button>
+        <button class="nav-item" data-view="casos"><span class="nav-icon">▣</span><span>Casos</span></button>
+        <button class="nav-item" data-view="alertas"><span class="nav-icon">◇</span><span>Alertas CX</span></button>
+        <button class="nav-item" data-view="reportes"><span class="nav-icon">▥</span><span>Reportes</span></button>
+        <button class="nav-item" data-view="conocimiento"><span class="nav-icon">⌑</span><span>Conocimiento</span></button>
+        <button class="nav-item" data-view="configuracion"><span class="nav-icon">⚙</span><span>Configuración</span></button>
       </nav>
 
-      <div class="sidebar-divider"></div>
-
-      <section class="module-panel" aria-label="Módulos CX">
-        <p>MÓDULOS CX</p>
-        <button class="module-card ventas active" data-module="ventas" type="button">
+      <div class="module-section">
+        <p class="section-title">MÓDULOS CX</p>
+        <button class="module-card sales" data-module="ventas">
           <span class="module-icon">▣</span>
           <span>Ventas</span>
-          <strong>5</strong>
         </button>
-        <button class="module-card onboarding" data-module="onboarding" type="button">
+        <button class="module-card onboarding" data-module="onboarding">
           <span class="module-icon">◆</span>
           <span>Onboarding</span>
-          <strong>7</strong>
         </button>
-        <button class="module-card soporte" data-module="soporte" type="button">
-          <span class="module-icon">☏</span>
+        <button class="module-card support" data-module="soporte">
+          <span class="module-icon">☎</span>
           <span>Soporte</span>
-          <strong>8</strong>
         </button>
-        <button class="module-card prepago pending" data-module="prepago" type="button">
-          <span class="module-icon">◌</span>
-          <span>Prepago</span>
-          <small>Pendiente</small>
-        </button>
-        <button class="module-card overnight pending" data-module="overnight" type="button">
-          <span class="module-icon">☾</span>
-          <span>Overnight</span>
-          <small>Pendiente</small>
-        </button>
-        <button class="module-card retencion" data-module="retencion" type="button">
+        <button class="module-card retention" data-module="retencion">
           <span class="module-icon">⟳</span>
           <span>Retención</span>
-          <strong>6</strong>
         </button>
-      </section>
+      </div>
 
-      <footer>© 2026 Personal CX Lab</footer>
+      <div class="sidebar-footer">© 2026 Personal CX Lab</div>
     </aside>
 
     <section class="workspace">
       <header class="topbar">
         <div>
-          <h1>¡Hola, <span id="displayName">Nicolás</span>! 👋</h1>
+          <h1>¡Hola, <span id="advisorGreeting">Nicolás</span>! 👋</h1>
           <p>Acá comienza cada conversación, acá empieza cada experiencia.</p>
         </div>
-        <div class="user-chip">
-          <div class="user-info">
-            <strong id="displayNameRight">Nicolás</strong>
+        <div class="top-user">
+          <div class="user-text">
+            <strong id="advisorProfileName">Nicolás</strong>
             <span>Asesor CX</span>
             <small><i></i> Conectado</small>
           </div>
@@ -100,63 +81,67 @@
       </header>
 
       <div class="toolbar">
-        <button id="filtersBtn" class="ghost-btn" type="button">▽ Filtros</button>
-        <button id="restartBtn" class="primary-btn" type="button">▣ Nueva conversación</button>
-        <button id="csvBtn" class="ghost-btn" type="button">Descargar CSV</button>
+        <button id="filtersBtn" class="tool-btn secondary"><span>▽</span> Filtros</button>
+        <button id="newSimulationBtn" class="tool-btn"><span>▣</span> Nueva simulación</button>
+        <button id="diagnosticBtn" class="tool-btn dark"><span>◇</span> Diagnóstico CX</button>
+        <button id="csvBtn" class="tool-btn secondary"><span>⇩</span> Descargar CSV</button>
       </div>
 
-      <section class="lab-grid">
-        <div class="phone-wrap">
-          <div class="phone">
-            <div class="phone-status">
-              <span id="phoneTime">11:42</span>
-              <span>▂ ▃ ▅  ᯤ ▰</span>
-            </div>
-            <div class="phone-header">
-              <button type="button" aria-label="Volver">‹</button>
-              <div class="bot-avatar">p</div>
-              <div>
-                <strong>Personal <em>●</em></strong>
-                <span>Cuenta oficial</span>
-              </div>
-              <b>⋮</b>
-            </div>
-            <div id="chat" class="chat"></div>
-            <div id="options" class="chat-options"></div>
-            <form id="textForm" class="composer">
-              <span>☺</span>
-              <input id="textInput" type="text" placeholder="Escribí un mensaje..." autocomplete="off" />
-              <button type="submit">➤</button>
-            </form>
+      <div class="main-grid">
+        <section class="phone-shell" aria-label="Chat simulado">
+          <div class="phone-status">
+            <span>11:42</span>
+            <span>▂ ▃ ▅  ◔ ▰</span>
           </div>
-        </div>
+          <div class="phone-header">
+            <span class="back">‹</span>
+            <div class="p-avatar">p</div>
+            <div>
+              <strong>Personal <b>✓</b></strong>
+              <small>Cuenta oficial</small>
+            </div>
+            <span class="dots">⋮</span>
+          </div>
+          <div id="chat" class="chat"></div>
+          <div id="options" class="chat-options"></div>
+          <form id="textForm" class="composer">
+            <span>☺</span>
+            <input id="textInput" type="text" placeholder="Escribí un mensaje..." autocomplete="off" />
+            <button type="submit" aria-label="Enviar">➤</button>
+          </form>
+        </section>
 
         <aside class="advisor-panel">
-          <div class="advisor-head">
-            <h2>Card para el asesor</h2>
-            <span id="contextStatus">En espera</span>
+          <div class="advisor-title-row">
+            <h2>Contexto para el asesor</h2>
+            <span id="contextBadge" class="context-badge waiting">En espera</span>
           </div>
-
-          <article id="advisorCard" class="advisor-card empty-state">
+          <div id="advisorCard" class="advisor-card empty-card">
             <h3>Seleccioná un módulo para iniciar</h3>
             <p>La card se completará con el contexto capturado durante el recorrido.</p>
-          </article>
-
-          <article id="suggestionCard" class="suggestion-card is-hidden">
+          </div>
+          <div id="actionBox" class="action-box hidden">
             <h3>💡 Acción sugerida</h3>
-            <p id="suggestionText"></p>
-          </article>
-
+            <p id="actionSuggestion"></p>
+          </div>
           <div class="advisor-actions">
-            <button id="crmBtn" class="ghost-btn" type="button">↗ Ver CRM</button>
-            <button id="contactBtn" class="primary-btn" type="button">☎ Tomar contacto</button>
+            <button id="crmBtn" class="outline-btn">□ Ver CRM</button>
+            <button id="takeContactBtn" class="primary-btn">☎ Tomar contacto</button>
           </div>
         </aside>
-      </section>
+      </div>
 
-      <p class="confidential-note">♢ Los datos mostrados son ficticios y de uso exclusivo para simulación de experiencia del cliente.</p>
+      <footer class="legal-note">◇ Los datos mostrados son ficticios y de uso exclusivo para simulación de experiencia del cliente.</footer>
     </section>
   </main>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <button id="modalClose" class="modal-close">×</button>
+      <h2 id="modalTitle">Título</h2>
+      <div id="modalContent"></div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
