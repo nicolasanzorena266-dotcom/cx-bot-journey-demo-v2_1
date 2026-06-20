@@ -3,115 +3,161 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Personal CX Lab · Journey Demo</title>
+  <title>Personal CX Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="lab-shell">
-    <aside class="sidebar" aria-label="Navegación CX Lab">
-      <div class="brand">
-        <strong>personal</strong>
-        <span>CX Lab</span>
+  <section id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="login-brand">
+        <span class="brand-personal">personal</span>
+        <span class="brand-lab">CX Lab</span>
+      </div>
+      <h1>Accedé al simulador</h1>
+      <p>Ingresá tu nombre para personalizar la experiencia del demo.</p>
+      <form id="loginForm" class="login-form">
+        <label for="agentName">Nombre</label>
+        <input id="agentName" name="agentName" type="text" placeholder="Ej: Nicolás" autocomplete="name" />
+        <button type="submit">Ingresar al simulador</button>
+      </form>
+      <small>Demo conceptual. No usa datos reales ni se conecta a sistemas productivos.</small>
+    </div>
+  </section>
+
+  <main id="appShell" class="app-shell is-hidden">
+    <aside class="sidebar">
+      <div class="brand-block">
+        <span class="brand-personal">personal</span>
+        <span class="brand-lab">CX Lab</span>
       </div>
 
-      <nav class="nav-list" aria-label="Secciones">
-        <button class="nav-item active"><span class="nav-icon">⌂</span>Inicio</button>
-        <button class="nav-item"><span class="nav-icon">☵</span>Conversaciones</button>
-        <button class="nav-item"><span class="nav-icon">▣</span>Casos</button>
-        <button class="nav-item with-badge"><span class="nav-icon">◇</span>Alertas Forenses <b>3</b></button>
-        <button class="nav-item"><span class="nav-icon">▥</span>Reportes</button>
-        <button class="nav-item"><span class="nav-icon">◫</span>Conocimiento</button>
-        <button class="nav-item"><span class="nav-icon">⚙</span>Configuración</button>
+      <nav class="main-nav" aria-label="Navegación principal">
+        <button class="nav-item active" type="button"><span>⌂</span>Inicio</button>
+        <button class="nav-item" type="button"><span>☵</span>Conversaciones</button>
+        <button class="nav-item" type="button"><span>▣</span>Casos</button>
+        <button class="nav-item" type="button"><span>♢</span>Alertas Forenses <b>3</b></button>
+        <button class="nav-item" type="button"><span>▥</span>Reportes</button>
+        <button class="nav-item" type="button"><span>◇</span>Conocimiento</button>
+        <button class="nav-item" type="button"><span>⚙</span>Configuración</button>
       </nav>
 
-      <div class="module-box">
-        <p class="module-title">Módulos CX</p>
-        <button class="module-chip sales" data-module="Ventas"><span class="module-icon">▣</span><span>Ventas</span><small>5</small></button>
-        <button class="module-chip onboarding" data-module="Onboarding"><span class="module-icon">●</span><span>Onboarding</span><small>7</small></button>
-        <button class="module-chip support" data-module="Soporte"><span class="module-icon">☏</span><span>Soporte</span><small>8</small></button>
-        <button class="module-chip prepaid" data-module="Prepago"><span class="module-icon">◌</span><span>Prepago</span><small>—</small></button>
-        <button class="module-chip overnight" data-module="Overnight"><span class="module-icon">☾</span><span>Overnight</span><small>—</small></button>
-        <button class="module-chip retention" data-module="Retención"><span class="module-icon">↺</span><span>Retención</span><small>6</small></button>
-        <button class="module-chip disabled" type="button" disabled><span class="module-icon">⌘</span><span>Personal Pay <em>fuera de alcance</em></span><small>🔒</small></button>
-      </div>
+      <div class="sidebar-divider"></div>
 
-      <p class="sidebar-foot">© 2026 Personal CX Lab</p>
+      <section class="module-panel" aria-label="Módulos CX">
+        <p>MÓDULOS CX</p>
+        <button class="module-card ventas active" data-module="ventas" type="button">
+          <span class="module-icon">▣</span>
+          <span>Ventas</span>
+          <strong>5</strong>
+        </button>
+        <button class="module-card onboarding" data-module="onboarding" type="button">
+          <span class="module-icon">◆</span>
+          <span>Onboarding</span>
+          <strong>7</strong>
+        </button>
+        <button class="module-card soporte" data-module="soporte" type="button">
+          <span class="module-icon">☏</span>
+          <span>Soporte</span>
+          <strong>8</strong>
+        </button>
+        <button class="module-card prepago pending" data-module="prepago" type="button">
+          <span class="module-icon">◌</span>
+          <span>Prepago</span>
+          <small>Pendiente</small>
+        </button>
+        <button class="module-card overnight pending" data-module="overnight" type="button">
+          <span class="module-icon">☾</span>
+          <span>Overnight</span>
+          <small>Pendiente</small>
+        </button>
+        <button class="module-card retencion" data-module="retencion" type="button">
+          <span class="module-icon">⟳</span>
+          <span>Retención</span>
+          <strong>6</strong>
+        </button>
+      </section>
+
+      <footer>© 2026 Personal CX Lab</footer>
     </aside>
 
-    <main class="workspace">
-      <header class="hero">
+    <section class="workspace">
+      <header class="topbar">
         <div>
-          <h1>¡Hola, María! 👋</h1>
+          <h1>¡Hola, <span id="displayName">Nicolás</span>! 👋</h1>
           <p>Acá comienza cada conversación, acá empieza cada experiencia.</p>
         </div>
-        <div class="user-card" aria-label="Usuario conectado">
-          <div class="user-copy">
-            <strong>María López</strong>
+        <div class="user-chip">
+          <div class="user-info">
+            <strong id="displayNameRight">Nicolás</strong>
             <span>Asesor CX</span>
             <small><i></i> Conectado</small>
           </div>
-          <div class="user-avatar">M</div>
+          <div class="user-avatar">●</div>
         </div>
       </header>
 
       <div class="toolbar">
-        <button id="reportBtn" class="btn light"><span>▽</span> Filtros</button>
-        <button id="restartBtn" class="btn primary"><span>☵</span> Nueva conversación</button>
-        <button id="csvBtn" class="btn light">Descargar CSV</button>
+        <button id="filtersBtn" class="ghost-btn" type="button">▽ Filtros</button>
+        <button id="restartBtn" class="primary-btn" type="button">▣ Nueva conversación</button>
+        <button id="csvBtn" class="ghost-btn" type="button">Descargar CSV</button>
       </div>
 
-      <section class="sim-grid">
-        <section class="phone" aria-label="Simulador de chat">
-          <div class="phone-status">11:42 <span>▮▮▮  Wi‑Fi  ▱</span></div>
-          <div class="phone-header">
-            <button class="back-btn" type="button">‹</button>
-            <div class="avatar">p</div>
-            <div>
-              <strong>Personal <span class="verified">●</span></strong>
-              <small>Cuenta oficial</small>
+      <section class="lab-grid">
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="phone-status">
+              <span id="phoneTime">11:42</span>
+              <span>▂ ▃ ▅  ᯤ ▰</span>
             </div>
-            <div class="phone-menu">⋮</div>
+            <div class="phone-header">
+              <button type="button" aria-label="Volver">‹</button>
+              <div class="bot-avatar">p</div>
+              <div>
+                <strong>Personal <em>●</em></strong>
+                <span>Cuenta oficial</span>
+              </div>
+              <b>⋮</b>
+            </div>
+            <div id="chat" class="chat"></div>
+            <div id="options" class="chat-options"></div>
+            <form id="textForm" class="composer">
+              <span>☺</span>
+              <input id="textInput" type="text" placeholder="Escribí un mensaje..." autocomplete="off" />
+              <button type="submit">➤</button>
+            </form>
           </div>
+        </div>
 
-          <div id="chat" class="chat"></div>
-          <div id="options" class="options"></div>
-
-          <form id="textForm" class="composer">
-            <span class="composer-icon">☺</span>
-            <input id="textInput" type="text" placeholder="Escribí un mensaje..." autocomplete="off" />
-            <span class="composer-icon">⌕</span>
-            <button type="submit" aria-label="Enviar">➤</button>
-          </form>
-        </section>
-
-        <aside class="advisor-panel" aria-label="Card para asesor">
-          <div class="panel-header">
+        <aside class="advisor-panel">
+          <div class="advisor-head">
             <h2>Card para el asesor</h2>
-            <span id="contextStatus" class="status-pill waiting">En espera</span>
+            <span id="contextStatus">En espera</span>
           </div>
 
-          <div id="advisorCard" class="empty-state">
-            <div class="empty-icon">▧</div>
-            <h3>Sin contexto todavía</h3>
-            <p>Elegí un flujo y avanzá el recorrido. Cuando el bot derive a asesor, la card se completa con los datos capturados.</p>
-          </div>
+          <article id="advisorCard" class="advisor-card empty-state">
+            <h3>Seleccioná un módulo para iniciar</h3>
+            <p>La card se completará con el contexto capturado durante el recorrido.</p>
+          </article>
 
-          <div class="panel-actions">
-            <button id="advisorSuggestionBtn" class="btn light">↗ Ver CRM</button>
-            <button id="forensicBtn" class="btn primary">☏ Tomar contacto</button>
-          </div>
+          <article id="suggestionCard" class="suggestion-card is-hidden">
+            <h3>💡 Acción sugerida</h3>
+            <p id="suggestionText"></p>
+          </article>
 
-          <div id="summary" class="summary hidden"></div>
+          <div class="advisor-actions">
+            <button id="crmBtn" class="ghost-btn" type="button">↗ Ver CRM</button>
+            <button id="contactBtn" class="primary-btn" type="button">☎ Tomar contacto</button>
+          </div>
         </aside>
       </section>
 
-      <footer class="privacy-note"><span>◇</span> Los datos mostrados son confidenciales y de uso exclusivo para gestión de experiencia del cliente.</footer>
-    </main>
-  </div>
+      <p class="confidential-note">♢ Los datos mostrados son ficticios y de uso exclusivo para simulación de experiencia del cliente.</p>
+    </section>
+  </main>
 
-  <script src="flow.js"></script>
-  <script src="context-pass.js"></script>
-  <script src="forensics.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
