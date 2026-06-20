@@ -230,6 +230,7 @@ function renderAdvisorCard() {
   const rows = getAdvisorRows(caseData.module);
   const crmRows = analysis.crm || [];
   const chips = (analysis.genes || []).map(g => `<span class="mini-chip">${escapeHtml(g)}</span>`).join("");
+  const severity = getSeverityBadge(caseData.module);
 
   contextStatus.textContent = "Contexto listo";
   contextStatus.className = "status-pill ready";
@@ -241,12 +242,14 @@ function renderAdvisorCard() {
         <h3>${escapeHtml(analysis.title)}</h3>
         <p>${escapeHtml(analysis.caseName || "Caso derivado a asesor")}</p>
       </div>
+      <span class="severity-badge">${escapeHtml(severity)}</span>
     </div>
 
     <div class="advisor-data">
       ${rows.map(row => `
         <div class="data-row">
-          <span>${escapeHtml(row.label)}</span>
+          <div class="data-icon">${getRowIcon(row.label)}</div>
+          <span>${escapeHtml(row.label)}:</span>
           <strong>${escapeHtml(row.value || "No informado")}</strong>
         </div>
       `).join("")}
@@ -256,7 +259,7 @@ function renderAdvisorCard() {
 
     ${crmRows.length ? `
       <div class="crm-box">
-        <h4>Datos a consultar en CRM / herramienta</h4>
+        <h4>Historial CRM / herramientas</h4>
         <ul>${crmRows.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
       </div>
     ` : ""}
@@ -266,6 +269,35 @@ function renderAdvisorCard() {
       <p>${escapeHtml(analysis.recommendation)}</p>
     </div>
   `;
+}
+
+function getSeverityBadge(module) {
+  const map = {
+    "Ventas": "COMERCIAL",
+    "Onboarding": "ATENCIÓN",
+    "Soporte": "PRIORIZAR",
+    "Retención": "ALTO RIESGO",
+    "Prepago": "PENDIENTE",
+    "Overnight": "PENDIENTE"
+  };
+  return map[module] || "CX";
+}
+
+function getRowIcon(label) {
+  const text = normalizeClass(label);
+  if (text.includes("dni")) return "▧";
+  if (text.includes("servicio")) return "⌁";
+  if (text.includes("motivo")) return "◇";
+  if (text.includes("caso")) return "▣";
+  if (text.includes("friccion")) return "△";
+  if (text.includes("historial")) return "↺";
+  if (text.includes("domicilio") || text.includes("linea")) return "⌂";
+  if (text.includes("importe")) return "$";
+  if (text.includes("promo") || text.includes("canal")) return "◌";
+  if (text.includes("inconveniente")) return "⚠";
+  if (text.includes("fecha")) return "◷";
+  if (text.includes("pruebas")) return "✓";
+  return "•";
 }
 
 function getAdvisorRows(module) {

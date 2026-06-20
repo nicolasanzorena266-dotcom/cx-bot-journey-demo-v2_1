@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app-shell">
+  <div class="lab-shell">
     <aside class="sidebar" aria-label="Navegación CX Lab">
       <div class="brand">
         <strong>personal</strong>
@@ -15,47 +15,60 @@
       </div>
 
       <nav class="nav-list" aria-label="Secciones">
-        <button class="nav-item active"><span>⌂</span>Inicio</button>
-        <button class="nav-item"><span>◌</span>Conversaciones</button>
-        <button class="nav-item"><span>▣</span>Casos</button>
-        <button class="nav-item"><span>◇</span>Alertas CX</button>
-        <button class="nav-item"><span>▥</span>Reportes</button>
+        <button class="nav-item active"><span class="nav-icon">⌂</span>Inicio</button>
+        <button class="nav-item"><span class="nav-icon">☵</span>Conversaciones</button>
+        <button class="nav-item"><span class="nav-icon">▣</span>Casos</button>
+        <button class="nav-item with-badge"><span class="nav-icon">◇</span>Alertas Forenses <b>3</b></button>
+        <button class="nav-item"><span class="nav-icon">▥</span>Reportes</button>
+        <button class="nav-item"><span class="nav-icon">◫</span>Conocimiento</button>
+        <button class="nav-item"><span class="nav-icon">⚙</span>Configuración</button>
       </nav>
 
       <div class="module-box">
-        <p class="module-title">Flujos a simular</p>
-        <button class="module-chip sales" data-module="Ventas">Ventas</button>
-        <button class="module-chip onboarding" data-module="Onboarding">Onboarding</button>
-        <button class="module-chip support" data-module="Soporte">Soporte</button>
-        <button class="module-chip prepaid" data-module="Prepago">Prepago</button>
-        <button class="module-chip overnight" data-module="Overnight">Overnight</button>
-        <button class="module-chip retention" data-module="Retención">Retención</button>
+        <p class="module-title">Módulos CX</p>
+        <button class="module-chip sales" data-module="Ventas"><span class="module-icon">▣</span><span>Ventas</span><small>5</small></button>
+        <button class="module-chip onboarding" data-module="Onboarding"><span class="module-icon">●</span><span>Onboarding</span><small>7</small></button>
+        <button class="module-chip support" data-module="Soporte"><span class="module-icon">☏</span><span>Soporte</span><small>8</small></button>
+        <button class="module-chip prepaid" data-module="Prepago"><span class="module-icon">◌</span><span>Prepago</span><small>—</small></button>
+        <button class="module-chip overnight" data-module="Overnight"><span class="module-icon">☾</span><span>Overnight</span><small>—</small></button>
+        <button class="module-chip retention" data-module="Retención"><span class="module-icon">↺</span><span>Retención</span><small>6</small></button>
+        <button class="module-chip disabled" type="button" disabled><span class="module-icon">⌘</span><span>Personal Pay <em>fuera de alcance</em></span><small>🔒</small></button>
       </div>
 
-      <p class="sidebar-foot">Demo conceptual · No usa datos reales</p>
+      <p class="sidebar-foot">© 2026 Personal CX Lab</p>
     </aside>
 
     <main class="workspace">
-      <header class="topbar">
+      <header class="hero">
         <div>
-          <p class="eyebrow">Personal CX Lab</p>
-          <h1>CX Journey Demo</h1>
-          <p>Simulador conversacional para recorrer flujos, capturar contexto y generar una card operativa para el asesor.</p>
+          <h1>¡Hola, María! 👋</h1>
+          <p>Acá comienza cada conversación, acá empieza cada experiencia.</p>
         </div>
-        <div class="top-actions">
-          <button id="restartBtn" class="btn secondary">Reiniciar caso</button>
-          <button id="reportBtn" class="btn ghost">Métricas</button>
-          <button id="csvBtn" class="btn primary">Descargar CSV</button>
+        <div class="user-card" aria-label="Usuario conectado">
+          <div class="user-copy">
+            <strong>María López</strong>
+            <span>Asesor CX</span>
+            <small><i></i> Conectado</small>
+          </div>
+          <div class="user-avatar">M</div>
         </div>
       </header>
 
-      <section class="sim-area">
+      <div class="toolbar">
+        <button id="reportBtn" class="btn light"><span>▽</span> Filtros</button>
+        <button id="restartBtn" class="btn primary"><span>☵</span> Nueva conversación</button>
+        <button id="csvBtn" class="btn light">Descargar CSV</button>
+      </div>
+
+      <section class="sim-grid">
         <section class="phone" aria-label="Simulador de chat">
+          <div class="phone-status">11:42 <span>▮▮▮  Wi‑Fi  ▱</span></div>
           <div class="phone-header">
-            <div class="avatar">P</div>
+            <button class="back-btn" type="button">‹</button>
+            <div class="avatar">p</div>
             <div>
-              <strong>Pía · Demo Bot</strong>
-              <span>en línea</span>
+              <strong>Personal <span class="verified">●</span></strong>
+              <small>Cuenta oficial</small>
             </div>
             <div class="phone-menu">⋮</div>
           </div>
@@ -64,17 +77,16 @@
           <div id="options" class="options"></div>
 
           <form id="textForm" class="composer">
+            <span class="composer-icon">☺</span>
             <input id="textInput" type="text" placeholder="Escribí un mensaje..." autocomplete="off" />
+            <span class="composer-icon">⌕</span>
             <button type="submit" aria-label="Enviar">➤</button>
           </form>
         </section>
 
         <aside class="advisor-panel" aria-label="Card para asesor">
           <div class="panel-header">
-            <div>
-              <p class="eyebrow">Context Pass</p>
-              <h2>Card para el asesor</h2>
-            </div>
+            <h2>Card para el asesor</h2>
             <span id="contextStatus" class="status-pill waiting">En espera</span>
           </div>
 
@@ -85,13 +97,15 @@
           </div>
 
           <div class="panel-actions">
-            <button id="advisorSuggestionBtn" class="btn ghost">Sugerencia asesor</button>
-            <button id="forensicBtn" class="btn dark">Análisis CX</button>
+            <button id="advisorSuggestionBtn" class="btn light">↗ Ver CRM</button>
+            <button id="forensicBtn" class="btn primary">☏ Tomar contacto</button>
           </div>
 
           <div id="summary" class="summary hidden"></div>
         </aside>
       </section>
+
+      <footer class="privacy-note"><span>◇</span> Los datos mostrados son confidenciales y de uso exclusivo para gestión de experiencia del cliente.</footer>
     </main>
   </div>
 
