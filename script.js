@@ -9,7 +9,7 @@ const flows = {
   ventas: {
     start: "ventas_dni",
     nodes: {
-      ventas_dni: { bot: "¡Hola! Soy el asistente virtual de Personal 😎\n\nPara ayudarte con una consulta comercial, escribime el DNI o CUIT asociado.", inputKey: "dniCuit", next: "ventas_producto" },
+      ventas_dni: { bot: "¡Hola! Soy Pía, tu asistente virtual 😎\n\nPara ayudarte con una consulta comercial, escribime el DNI o CUIT asociado.", inputKey: "dniCuit", next: "ventas_producto" },
       ventas_producto: { bot: "¿Qué servicio o producto querés consultar?", options: [
         ["Internet / TV", "ventas_fin"], ["Línea móvil", "ventas_fin"], ["Combo / Conexión Total", "ventas_fin"], ["Portabilidad", "ventas_fin"], ["Equipo contra factura", "ventas_fin"], ["Línea adicional", "ventas_fin"], ["Reposición de SIM / recuperar línea", "ventas_fin"], ["Otro producto / servicio", "ventas_fin"]
       ], storeKey: "productoSolicitado" },
@@ -99,9 +99,6 @@ document.querySelectorAll(".nav-item").forEach(btn => btn.addEventListener("clic
 document.getElementById("newSimulationBtn").addEventListener("click", resetWorkspace);
 document.getElementById("diagnosticBtn").addEventListener("click", showDiagnostic);
 document.getElementById("csvBtn").addEventListener("click", downloadCSV);
-document.getElementById("filtersBtn").addEventListener("click", showFilters);
-document.getElementById("crmBtn").addEventListener("click", showCRM);
-document.getElementById("takeContactBtn").addEventListener("click", takeContact);
 document.getElementById("modalClose").addEventListener("click", closeModal);
 modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 
@@ -280,32 +277,64 @@ function handleNav(view, btn) {
   btn.classList.add("active");
   const map = {
     inicio: ["Inicio", "Seleccioná un módulo CX para iniciar una simulación o usá Nueva simulación para limpiar el recorrido actual."],
-    conversaciones: ["Conversaciones", conversations.length ? conversations.map(c => `<div class='modal-content-card'><h3>${c.module}</h3><p>${c.path}</p></div>`).join("") : "No hay conversaciones guardadas en esta sesión."],
-    casos: ["Casos", currentModule ? diagnosticContent() : "No hay un caso activo todavía."],
-    alertas: ["Alertas CX", buildAlerts()],
+    conversaciones: ["Conversaciones", buildConversationsView()],
     reportes: ["Reportes", buildReport()],
     conocimiento: ["Conocimiento", buildKnowledge()],
-    configuracion: ["Configuración", `<p>Asesor actual: <strong>${escapeHtml(advisorName)}</strong></p><div class='modal-content-card'><p>Para cambiar el nombre, cerrá esta sesión recargando la página o usá Nueva simulación para reiniciar el caso.</p></div>`]
+    configuracion: ["Configuración", buildSettings()]
   };
   openModal(map[view][0], map[view][1]);
 }
-function buildAlerts() {
-  if (!currentModule) return "No hay alertas CX activas. Completá un recorrido para ver señales.";
-  if (currentModule === "ventas") return "Ventas no infiere riesgo ni fricción durante la captura inicial. Solo se deriva intención comercial.";
-  if (currentModule === "onboarding") return "Señal CX: inconsistencia comercial en primeros 60 días. Revisar oferta registrada, factura y criterio BC.";
-  if (currentModule === "soporte") return "Señal CX: posible repetición de diagnóstico. Evitar solicitar pruebas sin revisar historial CRM.";
-  return "Señal CX: riesgo de fuga. La propuesta debe responder al motivo real de salida, no solo al precio.";
+
+function buildConversationsView() {
+  if (!conversations.length) return "No hay conversaciones guardadas en esta sesión.";
+  return conversations.map(c => `
+    <details class="modal-content-card conversation-item">
+      <summary><strong>${escapeHtml(c.caseLabel)}</strong> · ${escapeHtml(c.module)} · ${escapeHtml(c.time)}</summary>
+      <div class="conversation-detail">
+        <p><strong>Estado:</strong> ${escapeHtml(c.status)}</p>
+        <p><strong>Recorrido:</strong> ${escapeHtml(c.path || "Sin interacciones del cliente")}</p>
+        <h3>Datos del caso</h3>
+        <table class="table-like">${c.rows.map(r => `<tr><th>${escapeHtml(r.label)}</th><td>${escapeHtml(r.value || "—")}</td></tr>`).join("")}</table>
+        <h3>Chat</h3>
+        <ol class="chat-log">${c.events.map(e => `<li><strong>${escapeHtml(e.actor)}</strong>: ${escapeHtml(e.content)}</li>`).join("")}</ol>
+      </div>
+    </details>`).join("");
 }
+
 function buildReport() {
   return `<table class="table-like"><tr><th>ID caso</th><td>${currentCaseId}</td></tr><tr><th>Módulo</th><td>${currentModule ? modules[currentModule].label : "Sin módulo"}</td></tr><tr><th>Mensajes bot</th><td>${events.filter(e => e.actor === "bot").length}</td></tr><tr><th>Interacciones cliente</th><td>${events.filter(e => e.actor === "cliente").length}</td></tr><tr><th>Derivado a asesor</th><td>${events.some(e => e.actor === "asesor") ? "Sí" : "No"}</td></tr></table>`;
 }
 function buildKnowledge() {
   return `<div class='modal-content-card'><h3>Ventas</h3><p>Captura mínima para consulta comercial: DNI/CUIT y producto solicitado.</p></div><div class='modal-content-card'><h3>Onboarding</h3><p>Primeros 60 días. Inconsistencia entre oferta comercial y primera factura.</p></div><div class='modal-content-card'><h3>Soporte</h3><p>Inconveniente técnico con afectación del servicio. Se consulta CRM para reclamos y visitas.</p></div><div class='modal-content-card'><h3>Retención</h3><p>Intención de baja, disconformidad o migración. Se captura motivo declarado.</p></div>`;
 }
-function showFilters() { openModal("Filtros", "<p>Filtro disponible en esta demo: seleccioná un módulo CX desde la barra lateral para cambiar el recorrido activo.</p>"); }
-function showCRM() { openModal("CRM simulado", currentModule ? `<table class='table-like'><tr><th>DNI/CUIT</th><td>${escapeHtml(data.dniCuit || "—")}</td></tr><tr><th>Servicio</th><td>${escapeHtml(data.servicio || data.productoSolicitado || "—")}</td></tr><tr><th>Reclamos recientes</th><td>Consultar sistema productivo</td></tr><tr><th>Última gestión</th><td>Dato no disponible en demo</td></tr></table>` : "No hay caso activo."); }
-function takeContact() { if (!currentModule) return openModal("Tomar contacto", "Seleccioná un módulo antes de tomar contacto."); addMessage("Asesor conectado. Retomo la gestión con el contexto del recorrido.", "advisor"); openModal("Tomar contacto", "Estado actualizado: asesor conectado al caso."); }
-function saveConversation() { const path = events.filter(e => e.actor === "cliente").map(e => e.content).join(" → "); conversations.unshift({ module: modules[currentModule].label, path: path || "Sin interacciones" }); conversations = conversations.slice(0, 5); }
+function buildSettings() {
+  return `<p>Asesor actual: <strong>${escapeHtml(advisorName)}</strong></p>
+  <div class='modal-content-card'>
+    <h3>Sesión</h3>
+    <p>Usá Nueva simulación para limpiar el recorrido actual. Para cambiar el nombre, recargá la página e ingresá nuevamente al simulador.</p>
+  </div>
+  <div class='modal-content-card'>
+    <h3>Conversaciones guardadas</h3>
+    <p>${conversations.length} conversación/es guardadas en esta sesión.</p>
+  </div>`;
+}
+
+function saveConversation() {
+  const path = events.filter(e => e.actor === "cliente").map(e => e.content).join(" → ");
+  const rows = currentModule ? getRowsForModule(currentModule) : [];
+  const caseLabel = `Caso ${String(conversations.length + 1).padStart(4, "0")}`;
+  conversations.unshift({
+    caseLabel,
+    caseId: currentCaseId,
+    module: currentModule ? modules[currentModule].label : "Sin módulo",
+    time: new Date().toLocaleString("es-AR", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" }),
+    status: events.some(e => e.actor === "asesor") ? "Derivado a asesor" : "En curso",
+    path: path || "Sin interacciones",
+    rows: rows.map(r => ({ ...r })),
+    events: events.map(e => ({ actor: e.actor, type: e.type, content: e.content }))
+  });
+  conversations = conversations.slice(0, 10);
+}
 function downloadCSV() {
   const rows = getRowsForModule(currentModule || "ventas");
   const csv = "\uFEFFCampo;Valor\n" + rows.map(r => `"${r.label.replaceAll('"','""')}";"${String(r.value || "").replaceAll('"','""')}"`).join("\n");

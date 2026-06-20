@@ -1,33 +1,16 @@
-# Personal CX Lab Demo
+# Konecta CX Lab Demo
 
-Simulador CX de recorridos conversacionales para Personal.
+Simulador CX de recorridos conversacionales para presentar flujos, capturar contexto y generar diagnóstico CX.
 
 ## Incluye
 
-- Login inicial estético con nombre dinámico del asesor.
-- Dashboard con estética tipo Personal CX Lab.
-- Sidebar funcional con Inicio, Conversaciones, Casos, Alertas CX, Reportes, Conocimiento y Configuración.
-- Módulos CX separados: Ventas, Onboarding, Soporte y Retención.
-- Chat central estilo WhatsApp.
-- Panel derecho de Contexto para el asesor.
-- Botón Diagnóstico CX.
-- Exportación CSV.
+- Login inicial con nombre de asesor.
+- Dashboard con estética Konecta CX Lab.
+- Sidebar funcional con Inicio, Conversaciones, Reportes, Conocimiento y Configuración.
+- Flujos separados: Ventas, Onboarding, Soporte y Retención.
+- Card de Contexto para el asesor.
+- Diagnóstico CX y exportación CSV.
 
-## Módulos
+## Nota
 
-### Ventas
-Captura mínima: DNI/CUIT y servicio/producto solicitado.
-No infiere riesgo ni fricción.
-
-### Onboarding
-Cliente dentro de primeros 60 días. Caso: inconsistencia entre oferta comercial y primera factura.
-
-### Soporte
-Inconveniente técnico con afectación del servicio. Reclamos y visitas recientes se consultan en CRM, no se preguntan al cliente.
-
-### Retención
-Solicitud de baja/disconformidad/migración. Captura motivo declarado.
-
-## Uso
-
-Abrir `index.html` o subir los archivos al repo de GitHub Pages.
+Demo conceptual. No usa datos reales ni se conecta a sistemas productivos.

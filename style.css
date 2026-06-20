@@ -48,20 +48,19 @@ button { cursor: pointer; }
   box-shadow: var(--shadow);
 }
 .brand-login { margin-bottom: 22px; }
-.brand-main {
+.brand-logo {
   display: block;
-  color: var(--blue-dark);
-  font-weight: 850;
-  letter-spacing: -.06em;
-  line-height: .85;
-  font-size: 42px;
+  width: min(250px, 100%);
+  height: auto;
+  object-fit: contain;
 }
 .brand-sub {
   display: block;
-  color: var(--blue-dark);
-  font-weight: 800;
+  color: #2b00d8;
+  font-weight: 850;
   font-size: 20px;
   margin-top: 8px;
+  letter-spacing: -.02em;
 }
 .login-card h1 { margin: 0 0 10px; font-size: 30px; letter-spacing: -.04em; }
 .login-card p { color: #475467; line-height: 1.5; margin: 0 0 22px; }
@@ -106,7 +105,7 @@ button { cursor: pointer; }
   flex-direction: column;
 }
 .brand { margin-bottom: 28px; }
-.sidebar .brand-main { font-size: 38px; }
+.sidebar .brand-logo { width: 190px; }
 .sidebar .brand-sub { font-size: 20px; }
 .side-nav { display: grid; gap: 10px; }
 .nav-item {
@@ -178,7 +177,7 @@ button { cursor: pointer; }
   color: #22c55e; display: grid; place-items: end; padding: 6px;
   font-size: 18px; box-shadow: 0 8px 20px rgba(79, 70, 229, .22);
 }
-.toolbar { display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 20px; }
+.toolbar { display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 20px; padding-right: 8px; }
 .tool-btn {
   min-height: 42px;
   border: 0;
